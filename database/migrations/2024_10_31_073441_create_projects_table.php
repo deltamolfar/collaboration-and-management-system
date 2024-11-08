@@ -12,9 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id();
+            $table->string('api_name')->unique()->primary();
+            $table->string('name');
+            $table->string('status')->default('open');
+            $table->foreignIdFor(\App\Models\User::class, 'owner');
             $table->timestamps();
         });
+
+        \App\Models\GlobalSetting::create([
+            'key' => 'project_statuses',
+            'value' => '{"open":"#008000","closed":"#FF0000"}',
+        ]);
+
+        \App\Models\GlobalSetting::create([
+            'key' => 'default_task_statuses',
+            'value' => '{"open":"#008000","closed":"#FF0000"}',
+        ]);
     }
 
     /**

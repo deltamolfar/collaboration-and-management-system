@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('status')->default('open');
+            $table->foreignIdFor(\App\Models\User::class, 'owner');
+            $table->foreignIdFor(\App\Models\Project::class, 'project');
             $table->timestamps();
         });
     }

@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('team', function (Blueprint $table) {
+        Schema::create('task_comments', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\Task::class, 'task');
+            $table->foreignIdFor(\App\Models\User::class, 'user');
+            $table->string('comment');
+            $table->text('attachments')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('team');
+        Schema::dropIfExists('task_comments');
     }
 };

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('role')->default('user');
             $table->timestamps();
         });
 
@@ -35,6 +36,13 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        \App\Models\User::create([
+            'name' => 'superadmin',
+            'email' => 'root@google.com',
+            'password' => 'root',
+            'role' => 'superadmin',
+        ]);
     }
 
     /**
