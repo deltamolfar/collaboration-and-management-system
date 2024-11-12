@@ -76,4 +76,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class);
     }
+
+    public function haveAbility($ability): bool
+    {
+        if ($this->role->abilities->contains($ability)) {
+            return true;
+        }
+
+        return false;
+    }
 }

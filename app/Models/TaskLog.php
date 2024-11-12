@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TaskLog extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'task',
-        'user',
+        'task_id',
+        'user_id',
         'comment',
         'time_start',
         'time_end',

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('task_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Task::class, 'task');
-            $table->foreignIdFor(\App\Models\User::class, 'user');
+            $table->foreignIdFor(\App\Models\Task::class);
+            $table->foreignIdFor(\App\Models\User::class);
             $table->string('comment');
             $table->text('attachments')->nullable();
             $table->timestamps();

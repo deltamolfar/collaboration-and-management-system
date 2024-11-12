@@ -32,6 +32,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'userAbilities' => fn (): array => $request->user()?->role?->abilities ?? [],
             'auth' => [
                 'user' => $request->user(),
             ],

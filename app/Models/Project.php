@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
+    use HasFactory;
+
+    protected $primaryKey = 'api_name';
     protected $fillable = [
         'api_name',
         'name',
-        'statuses',
         'status',
-        'owner',
-    ];
-
-    protected $casts = [
-        'statuses' => 'array',
+        'user_id',
     ];
 
     public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo

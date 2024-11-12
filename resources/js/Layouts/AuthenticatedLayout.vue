@@ -31,7 +31,7 @@ const showingNavigationDropdown = ref(false);
 
               <!-- Navigation Links -->
               <div
-                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                class="justify-between hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
               >
                 <NavLink
                   :href="route('dashboard')"
@@ -40,23 +40,54 @@ const showingNavigationDropdown = ref(false);
                   Home
                 </NavLink>
                 <NavLink
-                  :href="route('dashboard')"
-                  :active="route().current('dashboard')"
+                  :href="route('timesheet')"
+                  :active="route().current('timesheet')"
                 >
                   Timesheet
                 </NavLink>
                 <NavLink
-                  :href="route('dashboard')"
-                  :active="route().current('dashboard')"
+                  :href="route('projects.index')"
+                  :active="route().current('projects.index')"
                 >
                   Projects
+                </NavLink>
+                <NavLink
+                  :href="route('admin.dashboard')"
+                  :active="route().current('admin.dashboard')"
+                >
+                  Admin dashboard
                 </NavLink>
               </div>
             </div>
 
             <div class="hidden sm:ms-6 sm:flex sm:items-center">
               <!-- Settings Dropdown -->
-              <div class="relative ms-3">
+              <div class="relative flex ms-3">
+                <Dropdown align="right" width="48">
+                  <template #trigger>
+                    <span class="inline-flex rounded-md">
+                      <button
+                        type="button"
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-red-200 border border-transparent rounded-md hover:text-red-700 focus:outline-none dark:bg-red-800 dark:text-gray-400 dark:hover:text-red-300"
+                      >
+                        New
+                      </button>
+                    </span>
+                  </template>
+
+                  <template #content>
+                    <DropdownLink
+                      :href="route('profile.edit')"
+                    >
+                      Project
+                    </DropdownLink>
+                    <DropdownLink
+                      :href="route('logout')"
+                    >
+                      Task
+                    </DropdownLink>
+                  </template>
+                </Dropdown>
                 <Dropdown align="right" width="48">
                   <template #trigger>
                     <span class="inline-flex rounded-md">

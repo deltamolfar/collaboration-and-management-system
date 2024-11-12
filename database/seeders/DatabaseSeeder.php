@@ -2,22 +2,41 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Task;
+use App\Models\TaskLog;
+use App\Models\TaskComment;
+use App\Models\Project;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
+    public function run()
     {
-        // User::factory(10)->create();
+        // Create users
+        $users = User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create projects
+        $projects = Project::factory(5)->create([
+            'user_id' => 1, // Assign to existing user with id 1
+        ]);
+
+        // Create tasks
+        $tasks = Task::factory(20)->create([
+            'user_id' => 1, // Assign to existing user with id 1
+            'project_id' => $projects->random()->id,
+        ]);
+
+        // Create task logs
+        TaskLog::factory(50)->create([
+            'task_id' => $tasks->random()->id,
+            'user_id' => 1, // Assign to existing user with id 1
+        ]);
+
+        // Create task comments
+        TaskComment::factory(50)->create([
+            'task_id' => $tasks->random()->id,
+            'user_id' => 1, // Assign to existing user with id 1
         ]);
     }
 }

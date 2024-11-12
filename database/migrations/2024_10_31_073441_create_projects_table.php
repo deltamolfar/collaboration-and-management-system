@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('api_name')->unique()->primary();
             $table->string('name');
             $table->string('status')->default('open');
-            $table->foreignIdFor(\App\Models\User::class, 'owner');
+            $table->foreignIdFor(\App\Models\User::class);
             $table->timestamps();
         });
 
@@ -25,7 +25,7 @@ return new class extends Migration
         ]);
 
         \App\Models\GlobalSetting::create([
-            'key' => 'default_task_statuses',
+            'key' => 'task_statuses',
             'value' => '{"open":"#008000","closed":"#FF0000"}',
         ]);
     }

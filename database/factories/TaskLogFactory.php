@@ -2,22 +2,24 @@
 
 namespace Database\Factories;
 
+use App\Models\TaskLog;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TaskLog>
- */
 class TaskLogFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = TaskLog::class;
+
+    public function definition()
     {
         return [
-            //
+            'task_id' => Task::factory(),
+            'user_id' => User::factory(),
+            'comment' => $this->faker->sentence,
+            'time_start' => $this->faker->dateTime,
+            'time_end' => $this->faker->dateTime,
+            'time_spent' => $this->faker->numberBetween(1, 8),
         ];
     }
 }
