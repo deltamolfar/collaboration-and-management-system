@@ -39,7 +39,7 @@ return new class extends Migration
 
         \App\Models\User::create([
             'name' => 'superadmin',
-            'email' => 'root@google.com',
+            'email' => 'root@example.com',
             'password' => 'root',
             'role' => 'superadmin',
         ]);
