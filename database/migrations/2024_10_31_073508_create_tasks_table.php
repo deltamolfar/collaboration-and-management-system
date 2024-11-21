@@ -18,7 +18,11 @@ return new class extends Migration
             $table->string('status')->default('open');
             $table->foreignIdFor(\App\Models\User::class);
             $table->foreignIdFor(\App\Models\Project::class);
-            $table->integer('time_estimate')->nullable();
+            $table->foreignIdFor(\App\Models\TaskComment::class);
+            $table->foreignIdFor(\App\Models\TaskLog::class);
+            $table->integer('billable_minutes')->nullable();
+            $table->date('due_date')->nullable();
+            $table->json('assignees')->nullable();
             $table->timestamps();
         });
     }

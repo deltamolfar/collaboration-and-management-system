@@ -13,11 +13,6 @@ class TaskComment extends Model
         'task_id',
         'user_id',
         'comment',
-        'attachments',
-    ];
-
-    protected $casts = [
-        'attachments' => 'array',
     ];
 
     public function task(): \Illuminate\Database\Eloquent\Relations\BelongsTo
