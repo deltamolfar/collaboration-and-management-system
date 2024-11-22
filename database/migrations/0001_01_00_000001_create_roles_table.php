@@ -9,7 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-            $table->string('api_name')->unique()->primary();
+            $table->id();
+            $table->string('api_name')->unique();
             $table->string('name');
             $table->string('description')->nullable();
             $table->text('abilities');
@@ -21,14 +22,7 @@ return new class extends Migration
             'api_name' => 'superadmin',
             'name' => 'System Administrator',
             'description' => 'Have access to all abilities',
-            'abilities' => App\Models\Role::$abilities,
-        ]);
-
-        \App\Models\Role::create([
-            'api_name' => 'admin',
-            'name' => 'Administrator',
-            'description' => 'Have access to most abilities',
-            'abilities' => App\Models\Role::$abilities,
+            'abilities' => App\Models\Role::ability_list,
         ]);
 
         \App\Models\Role::create([

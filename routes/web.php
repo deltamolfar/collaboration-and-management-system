@@ -6,25 +6,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', function() {
+        return redirect()->route('dashboard');
+    });
     Route::get('/timesheet', [DashboardController::class, 'timesheet'])->name('timesheet');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -46,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')
         ->prefix('admin')
         ->group(function () {
-            Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
             Route::group(['prefix' => 'settings'], function () {
                 Route::get('/', [AdminDashboardController::class, 'settings'])->name('admin.settings.index');
                 Route::put('/', [AdminDashboardController::class, 'updateSettings'])->name('admin.settings.update');

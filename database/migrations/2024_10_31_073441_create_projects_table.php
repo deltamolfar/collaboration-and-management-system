@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('api_name')->unique()->primary();
             $table->string('name');
             $table->string('status')->default('open');
-            $table->foreignIdFor(\App\Models\User::class);
+            $table->foreignIdFor(\App\Models\User::class)->constrained();
             $table->timestamps();
         });
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->string('role')->default('user');
+            $table->foreignIdFor(\App\Models\Role::class)->constrained()->default(\App\Models\Role::where('api_name', 'Client')->first());
             $table->timestamps();
         });
 
@@ -41,7 +41,7 @@ return new class extends Migration
             'name' => 'superadmin',
             'email' => 'root@example.com',
             'password' => 'root',
-            'role' => 'superadmin',
+            'role_id' => \App\Models\Role::where('api_name', 'superadmin')->first()->id,
         ]);
     }
 

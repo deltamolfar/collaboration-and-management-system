@@ -17,7 +17,7 @@ class Role extends Model
         'abilities' => 'array',
     ];
 
-    public static $abilities = [
+    const ability_list = [
         'task.create',
         'task.update',
         'task.delete',
@@ -32,6 +32,7 @@ class Role extends Model
         'role.create',
         'role.update',
         'role.delete',
+        'admin_dashboard.view',
     ];
 
     public function users()

@@ -1,7 +1,14 @@
-<script setup>
-
+<script setup lang="ts">
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <div></div>
+    <Head title="Timesheet" />
+
+    <AuthenticatedLayout>
+        <div class="py-12">
+            
+        </div>
+    </AuthenticatedLayout>
 </template>

@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
     ];
 
     /**
@@ -79,10 +79,6 @@ class User extends Authenticatable
 
     public function haveAbility($ability): bool
     {
-        if ($this->role->abilities->contains($ability)) {
-            return true;
-        }
-
-        return false;
+        return in_array($ability, $this->role->abilities);
     }
 }
