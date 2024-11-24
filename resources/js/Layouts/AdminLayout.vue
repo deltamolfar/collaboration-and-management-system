@@ -1,12 +1,15 @@
-<script setup lang="ts">
+<script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 </script>
 
 <template>
-  <AuthenticatedLayout>
-    <div class="grid grid-cols-12 m-4 mt-2">
-      <div class="flex flex-col col-span-4 p-1 bg-gray-300 rounded-l-md">
-        <h1 class="mt-2 text-2xl font-extrabold text-center">Admin Dashboard</h1>
+  <AuthenticatedLayout class="h-full">
+    <div class="grid h-full min-h-full grid-cols-12 m-4 mt-2">
+      <div class="flex flex-col col-span-4 bg-gray-100 dark:bg-gray-700 rounded-l-md">
+        <h1 class="my-2 text-2xl font-extrabold text-center dark:text-white">Admin Dashboard</h1>
+        <a :href="route('admin.dashboard')">
+            <div class="rounded-t-md page-btn">Dashboard</div>
+        </a>
         <a :href="route('admin.users.index')">
             <div class="rounded-t-md page-btn">Users</div>
         </a>
@@ -14,10 +17,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
             <div class="page-btn">Roles</div>
         </a>
         <a :href="route('admin.settings.index')">
-            <div class="page-btn">Miscellaneous</div>
+            <div class="rounded-b-md page-btn">Miscellaneous</div>
         </a>
       </div>
-      <div class="col-span-8 p-2 bg-gray-200 rounded-r-md">
+      <div class="col-span-8 p-2 bg-gray-200 dark:text-white dark:bg-gray-600 rounded-r-md">
         <slot name="header" />
         <slot />
       </div>
@@ -28,14 +31,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 <style scoped>
 .page-btn {
   padding: 10px;
-  margin: 5px 0;
-  background-color: #f0f0f0;
   text-align: center;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-.page-btn:hover {
-  background-color: #e0e0e0;
+  @apply hover:bg-gray-500 m-0 dark:text-white font-semibold text-lg;
 }
 </style>

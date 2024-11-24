@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->string('api_name')->unique()->primary();
-            $table->string('name');
+            $table->id();
+            $table->string('name')->unique();
+            //$table->string('signature')->unique();
             $table->string('status')->default('open');
             $table->foreignIdFor(\App\Models\User::class)->constrained();
             $table->timestamps();

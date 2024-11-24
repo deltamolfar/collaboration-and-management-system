@@ -32,4 +32,12 @@ class AdminDashboardController extends Controller
 
         return redirect()->route('admin.global_settings.index')->with('success', 'Global setting updated successfully.');
     }
+    
+    public function users()
+    {
+        return Inertia::render('Admin/Users', [
+            'users' => \App\Models\User::all(),
+            'roles' => \App\Models\Role::all(),
+        ]);
+    }
 }

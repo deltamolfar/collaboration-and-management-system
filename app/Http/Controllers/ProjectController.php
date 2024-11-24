@@ -11,26 +11,31 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         return Inertia::render('Projects/Index', [
-            'paginatedProjects' => Project::query()->paginate($request->input('limit', 50)),
+            'projects' => Project::all(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Projects/Create');
+        return Inertia::render('Projects/Create', [
+            'statuses' => \App\Models\GlobalSetting::where('key', 'project_statuses')->first()->value,
+            'users' => \App\Models\User::all(),
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'api_name' => 'required|unique:projects,api_name',
+        $data = $request->validate([
             'name' => 'required|string|max:255',
-            'statuses' => 'required|array',
+            'statuses' => 'nullable|array',
             'status' => 'required|string',
-            'owner_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
         ]);
 
-        Project::create($request->all());
+        if(!$request->has('statuses')) {
+            $data['statuses'] = \App\Models\GlobalSetting::where('key', 'project_statuses')->first()->value;
+        }
+        Project::create($data);
 
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
@@ -39,7 +44,7 @@ class ProjectController extends Controller
     {
         #dd($project);
         return Inertia::render('Projects/Show', [
-            'project' => $project,
+            'project' => $project::with('tasks.users')->with('owner')->first(),
         ]);
     }
 
@@ -53,7 +58,6 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $request->validate([
-            'api_name' => 'required|unique:projects,api_name,' . $project->id,
             'name' => 'required|string|max:255',
             'statuses' => 'required|array',
             'status' => 'required|string',

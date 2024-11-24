@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,8 +21,21 @@ class TaskController extends Controller
         ]);
     }
 
-    public function create (Request $request) {
-        $project = $request->input('project');
+    public function show (Request $request, Project $project, Task $task) {
+        if(!$project || !$task) {
+            return Inertia::render('Errors/404',
+                ['message' => 'Project or Task not found.']
+            );
+        }
+
+        return Inertia::render('Tasks/Show', [
+            'project' => $project,
+            'task' => $task::with('users')->find($task->id),
+            'comments' => \App\Models\TaskComment::with('user')->where('task_id', $task->id)->get(),
+        ]);
+    }
+
+    public function create (Request $request, Project $project) {
         if(!$project) {
             return Inertia::render('Errors/404',
                 ['message' => 'Project not found.']
@@ -30,29 +44,34 @@ class TaskController extends Controller
 
         return Inertia::render('Tasks/Create', [
             'project' => $project,
-            'users' => $project->users()->get(),
+            'users' => \App\Models\User::with('role')->get(),
         ]);
     }
 
-    public function store (Request $request) {
-        $request->validate([
-            'project_id' => 'required|integer',
+    public function store (Request $request, Project $project) {
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'user_id' => 'required|integer',
+            'status' => 'required|string|max:255',
             'due_date' => 'required|date',
+            'assignees' => 'required|array|min:1',
         ]);
 
-        $project = Project::find($request->input('project_id'));
+        $data['users'] = $data['assignees'];
+        $data['project_id'] = $project->id;
+        $data['user_id'] = $request->user()->id;
         if(!$project) {
-            return Inertia::render('Errors/404',
-                ['message' => 'Project not found.']
-            );
+            return response()->json(['error' => 'Project not found.'], 404);
         }
+        
+        $newTask = $project->tasks()->create($data);
+        $newTask->users()->attach($data['assignees']);
+        $newTask->save();
 
-        $project->tasks()->create($request->all());
-
-        return redirect()->route('tasks.index', ['project' => $project])->with('success', 'Task created successfully.');
+        return redirect()->route('tasks.show', [
+            'project' => $project,
+            'task' => $newTask,
+        ])->with('success', 'Task created successfully.');
     }
 
     public function edit (Request $request) {

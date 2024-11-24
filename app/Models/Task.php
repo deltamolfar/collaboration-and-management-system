@@ -14,14 +14,9 @@ class Task extends Model
         'description',
         'status',
         'user_id',
-        'project',
+        'project_id',
         'due_date',
         'billable_minutes',
-        'assignees',
-    ];
-
-    protected $casts = [
-        'assignees' => 'array',
     ];
 
     public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -29,7 +24,7 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function comment(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(TaskComment::class);
     }

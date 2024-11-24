@@ -69,7 +69,7 @@ const showingNavigationDropdown = ref(false);
                     <span class="inline-flex rounded-md">
                       <button
                         type="button"
-                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-red-200 border border-transparent rounded-md hover:text-red-700 focus:outline-none dark:bg-red-800 dark:text-gray-400 dark:hover:text-red-300"
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-white transition duration-150 ease-in-out bg-red-200 border border-transparent rounded-md hover:text-red-700 focus:outline-none hover:bg-red-500 dark:bg-red-600 dark:text-gray-400 dark:hover:text-red-300"
                       >
                         New
                       </button>
@@ -78,14 +78,9 @@ const showingNavigationDropdown = ref(false);
 
                   <template #content>
                     <DropdownLink
-                      :href="route('profile.edit')"
+                      :href="route('projects.create')"
                     >
                       Project
-                    </DropdownLink>
-                    <DropdownLink
-                      :href="route('logout')"
-                    >
-                      Task
                     </DropdownLink>
                   </template>
                 </Dropdown>
@@ -234,12 +229,12 @@ const showingNavigationDropdown = ref(false);
       </header>
 
       <!-- Page Content -->
-      <main>
+      <main class="h-full min-h-screen">
         <Flash flashName="success" flashColor="green" />
         <Flash flashName="error" flashColor="red" />
         <Flash flashName="warning" flashColor="yellow" />
         <Flash flashName="info" flashColor="blue" />
-        <slot />
+        <slot class="h-full min-h-screen" />
       </main>
     </div>
   </div>

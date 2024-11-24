@@ -16,13 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('status')->default('open');
-            $table->foreignIdFor(\App\Models\User::class)->constrained();
+            $table->foreignIdFor(\App\Models\User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\Project::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\TaskComment::class)->constrained();
-            $table->foreignIdFor(\App\Models\TaskLog::class)->constrained();
             $table->integer('billable_minutes')->nullable();
             $table->date('due_date')->nullable();
-            $table->json('assignees')->nullable();
             $table->timestamps();
         });
     }

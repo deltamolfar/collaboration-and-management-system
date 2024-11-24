@@ -9,9 +9,7 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'api_name';
     protected $fillable = [
-        'api_name',
         'name',
         'status',
         'user_id',

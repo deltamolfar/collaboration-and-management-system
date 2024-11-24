@@ -5,7 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -20,16 +22,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
-    Route::get('projects/{api_name}', [ProjectController::class, 'show'])->name('projects.show');
-    Route::put('projects/{api_name}', [ProjectController::class, 'update'])->name('projects.update');
-    Route::delete('projects/{api_name}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
-    Route::get('/projects/{api_name}/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::post('/projects/{api_name}/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::get('/projects/{api_name}/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-    Route::put('/projects/{api_name}/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/projects/{api_name}/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::get('/projects/{project}/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+    Route::post('/projects/{project}/tasks/create', [TaskController::class, 'store'])->name('tasks.store');
+    Route::get('/projects/{project}/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::put('/projects/{project}/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/projects/{project}/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    Route::post('/projects/{project}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store');
+    Route::delete('/projects/{project}/tasks/{task}/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy');
 
     Route::middleware('admin')
         ->prefix('admin')
@@ -40,11 +48,10 @@ Route::middleware('auth')->group(function () {
                 Route::put('/', [AdminDashboardController::class, 'updateSettings'])->name('admin.settings.update');
 
                 Route::get('/users', [AdminDashboardController::class, 'users'])->name('admin.users.index');
-                Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('admin.users.store');
+                Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
 
-                Route::get('/users/{user}', [AdminDashboardController::class, 'editUser'])->name('admin.users.edit');
-                Route::put('/users/{user}', [AdminDashboardController::class, 'updateUser'])->name('admin.users.update');
-                Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('admin.users.destroy');
+                Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+                Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
                 Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles.index');
                 Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
