@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskLogController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{project}/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/projects/{project}/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
+    Route::get('/projects/{project}/tasks/{task}/log', [TaskLogController::class, 'index'])->name('tasks.logs.index');
+    Route::post('/projects/{project}/tasks/{task}/log', [TaskLogController::class, 'store'])->name('tasks.logs.store');
+    Route::delete('/projects/{project}/tasks/{task}/log/{log}', [TaskLogController::class, 'destroy'])->name('tasks.logs.destroy');
+    Route::put('/projects/{project}/tasks/{task}/log/{log}', [TaskLogController::class, 'update'])->name('tasks.logs.update');
+
+    Route::get('/projects/{project}/tasks/{task}/comments', [TaskCommentController::class, 'index'])->name('tasks.comments.index');
     Route::post('/projects/{project}/tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store');
     Route::delete('/projects/{project}/tasks/{task}/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy');
 

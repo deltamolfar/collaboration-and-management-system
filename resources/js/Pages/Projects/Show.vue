@@ -6,6 +6,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+const navigateToTask = (task) => {
+  window.location.href = route('tasks.show', { project: props.project.id, task: task.id });
+};
 </script>
 
 <template>
@@ -34,10 +38,10 @@ const props = defineProps({
           <tr v-if="project.tasks.length <= 0">
             <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500 whitespace-nowrap">No tasks found</td>
           </tr>
-          <a
+          <tr
             v-for="task in project.tasks" :key="task.id"
             class="hover:cursor-pointer hover:bg-gray-100"
-            :href="route('tasks.show', {project, task})"
+            @click="navigateToTask(task)"
           >
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ task.id }}</td>
             <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ task.name }}</td>
@@ -49,7 +53,7 @@ const props = defineProps({
             <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ task.status }}</td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ new Date(task.updated_at).toLocaleDateString() }}</td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ new Date(task.due_date).toLocaleDateString() }}</td>
-          </a>
+          </tr>
         </tbody>
       </table>
     </div>
