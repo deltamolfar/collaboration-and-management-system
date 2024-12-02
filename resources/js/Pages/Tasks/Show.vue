@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -21,10 +21,6 @@ const props = defineProps({
     required: true,
   },
   users: {
-    type: Array,
-    required: true,
-  },
-  statuses: {
     type: Array,
     required: true,
   },
@@ -69,6 +65,7 @@ const submitComment = async () => {
 const submitLog = async () => {
   try {
     const resp = await axios.post(route('tasks.logs.store', { project: props.project, task: props.task }), {
+      user_id: user.id,
       ...newLog.value,
     });
     console.log(resp);
@@ -78,7 +75,7 @@ const submitLog = async () => {
       time_spent: '',
       description: '',
     };
-    location.reload();
+    //location.reload();
   } catch (error) {
     console.error(error);
     if (error.response) {
@@ -94,7 +91,7 @@ const deleteTask = async () => {
   }
 };
 
-const form = useForm({
+const form = ref({
   name: props.task.name,
   description: props.task.description,
   status: props.task.status,
@@ -103,14 +100,17 @@ const form = useForm({
 });
 
 const updateTask = async () => {
-  try {
-    await form.put(route('tasks.update', { project: props.project, task: props.task }));
-    location.reload();
-  } catch (error) {
-    if (error.response) {
-      errors.value = error.response.data.errors;
-    }
-  }
+  console.log(form.value);
+  const sendForm = form.value;
+  sendForm['assignees'] = ''+sendForm['assignees'];
+  await axios.put(route('tasks.update', { project: props.project, task: props.task }), {
+      ...form.value,
+    }).catch((error) => {
+      console.error(error);
+      if (error.response) {
+        errors.value = error.response.data.errors;
+      }
+    });
 };
 </script>
 
@@ -130,7 +130,7 @@ const updateTask = async () => {
           <div class="p-6 bg-white border-b border-gray-200">
             <div class="flex justify-between">
               <h3 class="text-2xl font-bold">
-                <input v-if="canEdit" v-model="form.name" type="text" class="block w-full mt-1" />
+                <input v-if="canEdit" @blur="updateTask" v-model="form.name" type="text" class="block w-full mt-1" />
                 <span v-else>{{ task.name }}</span>
               </h3>
               <button v-if="canDelete" @click="deleteTask" class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-red-500 border border-transparent rounded-md hover:bg-red-700 active:bg-red-900 focus:outline-none focus:border-red-900 focus:ring ring-red-300 disabled:opacity-25">
@@ -138,31 +138,31 @@ const updateTask = async () => {
               </button>
             </div>
             <p class="mt-2">
-              <textarea v-if="canEdit" v-model="form.description" class="block w-full mt-1" rows="3"></textarea>
+              <textarea v-if="canEdit" @blur="updateTask" v-model="form.description" class="block w-full mt-1" rows="3"></textarea>
               <span v-else>{{ task.description }}</span>
             </p>
             <p class="mt-2">
-              <strong>Status:</strong>
-              <select v-if="canEdit" v-model="form.status" class="block w-full mt-1">
-                <option v-for="status in statuses" :key="status" :value="status">{{ status }}</option>
+              <strong>Status</strong>
+              <select v-if="canEdit" @change="updateTask" v-model="form.status" class="block w-full mt-1">
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="paused">Paused</option>
+                <option value="client_test">Client Test</option>
+                <option value="completed">Completed</option>
               </select>
               <span v-else>{{ task.status }}</span>
             </p>
             <p class="mt-2">
-              <strong>Due Date:</strong>
-              <input v-if="canEdit" v-model="form.due_date" type="date" class="block w-full mt-1" />
+              <strong>Due Date</strong>
+              <input v-if="canEdit" @change="updateTask" v-model="form.due_date" type="date" class="block w-full mt-1" />
               <span v-else>{{ new Date(task.due_date).toLocaleDateString() }}</span>
             </p>
             <p class="mt-2">
-              <strong>Assignees:</strong>
-              <!-- <Multiselect v-if="canEdit" v-model="form.assignees" :options="users" :multiple="true" label="name" track-by="id" class="block w-full mt-1" />
-              <ul v-else>
-                <li v-for="user in task.users" :key="user.id">{{ user.name }}</li>
-              </ul> -->
+              <strong>Assignee</strong>
+              <select v-if="canEdit" @change="updateTask" v-model="form.assignees" class="block w-full mt-1">
+                <option v-for="user in users" :key="user.id" :value="[user.id]" :selected="user.id==form.assignees">{{ user.name }}</option>
+              </select>
             </p>
-            <button v-if="canEdit" @click="updateTask" class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-blue-500 border border-transparent rounded-md hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25">
-              Update Task
-            </button>
           </div>
         </div>
 
@@ -209,8 +209,8 @@ const updateTask = async () => {
 
   <dialog v-show="dialog" class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-transparent backdrop-blur-sm">
     <div class="w-1/2">
-      <div class="flex justify-between pl-1 rounded-t-lg dark:bg-gray-700">
-        <h1 class="self-center dark:text-white">Add Time Log</h1>
+      <div class="flex justify-between pl-2 rounded-t-lg dark:bg-gray-700">
+        <h1 class="self-center text-lg font-semibold dark:text-white">Add Time Log</h1>
         <button class="w-8 h-8 text-2xl font-black text-center text-white bg-red-500 rounded-tr-lg rounded-bl-lg hover:bg-red-400" @click="dialog = false">X</button>
       </div>
       <div class="flex flex-col px-2 pb-2 bg-gray-100 rounded-b-lg dark:bg-gray-700">
@@ -223,7 +223,7 @@ const updateTask = async () => {
           <input v-model="newLog.time_end" type="datetime-local" class="text-white bg-gray-600 rounded-md shadow-md" />
         </label>
         <label class="flex flex-col mt-4">
-          <span class="text-white">Time Spent (hours)</span>
+          <span class="text-white">Time Spent (hours)<span class="font-bold text-red-500">*</span></span>
           <input v-model="newLog.time_spent" type="number" class="text-white bg-gray-600 rounded-md shadow-md" />
         </label>
         <label class="flex flex-col mt-4">

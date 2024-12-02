@@ -20,10 +20,10 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(User::class);
-    }
+    // public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    // {
+    //     return $this->belongsToMany(User::class);
+    // }
 
     public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

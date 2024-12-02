@@ -32,6 +32,8 @@ class TaskController extends Controller
             'project' => $project,
             'task' => $task::with('users')->find($task->id),
             'comments' => \App\Models\TaskComment::with('user')->where('task_id', $task->id)->get(),
+            'users' => \App\Models\User::all(),
+            'logs' => \App\Models\TaskLog::with('user')->where('task_id', $task->id)->get(),
         ]);
     }
 
@@ -50,11 +52,11 @@ class TaskController extends Controller
 
     public function store (Request $request, Project $project) {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'status' => 'required|string|max:255',
-            'due_date' => 'required|date',
-            'assignees' => 'required|array|min:1',
+            'name'          => 'required|string|max:255',
+            'description'   => 'required|string|max:1024',
+            'due_date'      => 'required|date',
+            'assignees'     => 'required|string|min:1',
+            'status'        => 'required|string|max:255',
         ]);
 
         $data['users'] = $data['assignees'];
@@ -90,17 +92,15 @@ class TaskController extends Controller
         ]);
     }
 
-    public function update (Request $request) {
+    public function update (Request $request, Project $project, Task $task) {
         $request->validate([
-            'project_id' => 'required|integer',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'user_id' => 'required|integer',
-            'due_date' => 'required|date',
+            'name'          => 'required|string|max:255',
+            'description'   => 'required|string|max:1024',
+            'due_date'      => 'required|date',
+            'assignees'     => 'required|string|min:1',
+            'status'        => 'required|string|max:255',
         ]);
 
-        $project = Project::find($request->input('project_id'));
-        $task = $request->input('task');
         if(!$project || !$task) {
             return Inertia::render('Errors/404',
                 ['message' => 'Project or Task not found.']
@@ -109,7 +109,7 @@ class TaskController extends Controller
 
         $task->update($request->all());
 
-        return redirect()->route('tasks.index', ['project' => $project])->with('success', 'Task updated successfully.');
+        return response("success", status: 200);
     }
 
     public function destroy (Request $request) {

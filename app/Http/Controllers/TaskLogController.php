@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
+use App\Models\Task;
 use App\Models\TaskLog;
 use Illuminate\Http\Request;
 
@@ -11,17 +13,19 @@ class TaskLogController extends Controller
         return TaskLog::all();
     }
 
-    public function store(Request $request){
+    public function store(Request $request, Project $project, Task $task){
         $request->validate([
-            'task_id' => 'required|exists:tasks,id',
-            'user_id' => 'required|exists:users,id',
-            'description' => 'required|string',
-            'time_spent' => 'required|integer',
-            'time_start' => 'nullable|date',
-            'time_end' => 'nullable|date',
+            'user_id'       => 'required|exists:users,id',
+            'time_start'    => 'nullable|date',
+            'time_end'      => 'nullable|date',
+            'time_spent'    => 'required|integer',
+            'description'   => 'nullable|string',
         ]);
 
-        return TaskLog::create($request->all());
+        return TaskLog::create([
+            'task_id' => $task->id,
+            ...$request->all()
+        ]);
     }
 
     public function update(Request $request, TaskLog $log){
