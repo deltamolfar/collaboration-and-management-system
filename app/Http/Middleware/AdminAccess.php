@@ -15,11 +15,10 @@ class AdminAccess
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!$request->user()->haveAbility("admin_dashboard.view")) {
+        if(!$request->user()->hasAbility("admin_dashboard.view")) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view this page.');
         } else {
             return $next($request);
         }
-
     }
 }

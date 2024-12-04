@@ -1,5 +1,4 @@
-<script setup lang="ts">
-import { ref } from 'vue';
+<script setup>
 import { useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
@@ -39,7 +38,7 @@ const submit = () => {
     <div class="p-4 overflow-hidden shadow-sm sm:rounded-lg">
       <form @submit.prevent="submit">
         <div class="mt-4">
-          <label for="name" class="block text-sm font-medium text-white">Name</label>
+          <label for="name" class="block text-sm font-medium dark:text-white">Name</label>
           <input v-model="form.name" type="text" name="name" id="name" class="block w-full mt-1" required />
           <span class="text-sm text-red-500">{{ form.errors.name }}</span>
         </div>
@@ -53,7 +52,7 @@ const submit = () => {
         </div>-->
 
         <div class="mt-4">
-          <label for="status" class="block text-sm font-medium text-white">Status</label>
+          <label for="status" class="block text-sm font-medium dark:text-white">Status</label>
           <select v-model="form.status" name="status" id="status" class="block w-full mt-1" required>
               <option value="open">Open</option>
               <option value="closed">Closed</option>
@@ -62,7 +61,7 @@ const submit = () => {
         </div>
 
         <div class="mt-4">
-          <label for="user_id" class="block text-sm font-medium text-white">Owner</label>
+          <label for="user_id" class="block text-sm font-medium dark:text-white">Owner</label>
           <select v-model="form.user_id" name="user_id" id="user_id" class="block w-full mt-1" required>
               <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
           </select>

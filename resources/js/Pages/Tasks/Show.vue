@@ -33,10 +33,10 @@ const props = defineProps({
 const page = usePage();
 const user = page.props.auth.user;
 
-const canEdit = ref(true);// TODO: DIPL ref(user.role.abilities.includes('task.update'));
-const canDelete = ref(true);//TODO: DIPL //ref(user.role.abilities.includes('task.delete'));
-const canComment = ref(true);//TODO: DIPL //ref(user.role.abilities.includes('task.comment'));
-const canLogTime = ref(true);//TODO: DIPL
+const canEdit = ref(false);// TODO: DIPL ref(user.role.abilities.includes('task.update'));
+const canDelete = ref(false);//TODO: DIPL //ref(user.role.abilities.includes('task.delete'));
+const canComment = ref(false);//TODO: DIPL //ref(user.role.abilities.includes('task.comment'));
+const canLogTime = ref(false);//TODO: DIPL
 
 const newComment = ref('');
 const newLog = ref({
@@ -126,11 +126,34 @@ const updateTask = async () => {
 
     <div class="py-12">
       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+        <div class="flex items-center justify-between overflow-hidden bg-white shadow-sm sm:rounded-lg">
+          <p class="flex items-center gap-2 px-2">
+              <strong>Status</strong>
+              <select v-if="canEdit" @change="updateTask" v-model="form.status" class="block w-full p-1 px-8 my-1">
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="paused">Paused</option>
+                <option value="client_test">Client Test</option>
+                <option value="completed">Completed</option>
+              </select>
+              <span v-else>{{ task.status }}</span>
+            </p>
+          <Link :href="route('projects.show', props.project)" class="items-center block p-4 py-2 mx-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-blue-500 border border-transparent rounded-md hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25">
+            Go back to all tasks
+          </Link>
+        </div>
+
+        <div class="mt-6 overflow-hidden bg-white shadow-sm sm:rounded-lg">
           <div class="p-6 bg-white border-b border-gray-200">
             <div class="flex justify-between">
               <h3 class="text-2xl font-bold">
-                <input v-if="canEdit" @blur="updateTask" v-model="form.name" type="text" class="block w-full mt-1" />
+                <input 
+                  v-if="canEdit"
+                  @blur="updateTask"
+                  v-model="form.name"
+                  type="text"
+                  class="block w-full mt-1"
+                />
                 <span v-else>{{ task.name }}</span>
               </h3>
               <button v-if="canDelete" @click="deleteTask" class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-red-500 border border-transparent rounded-md hover:bg-red-700 active:bg-red-900 focus:outline-none focus:border-red-900 focus:ring ring-red-300 disabled:opacity-25">
@@ -140,17 +163,6 @@ const updateTask = async () => {
             <p class="mt-2">
               <textarea v-if="canEdit" @blur="updateTask" v-model="form.description" class="block w-full mt-1" rows="3"></textarea>
               <span v-else>{{ task.description }}</span>
-            </p>
-            <p class="mt-2">
-              <strong>Status</strong>
-              <select v-if="canEdit" @change="updateTask" v-model="form.status" class="block w-full mt-1">
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="paused">Paused</option>
-                <option value="client_test">Client Test</option>
-                <option value="completed">Completed</option>
-              </select>
-              <span v-else>{{ task.status }}</span>
             </p>
             <p class="mt-2">
               <strong>Due Date</strong>

@@ -18,7 +18,8 @@ class ProjectController extends Controller
     public function create()
     {
         return Inertia::render('Projects/Create', [
-            'statuses' => \App\Models\GlobalSetting::where('key', 'project_statuses')->first()->value,
+            'statuses' => \App\Models\GlobalSetting::where('key', 'project_statuses')
+                ->first()->value,
             'users' => \App\Models\User::all(),
         ]);
     }
@@ -40,9 +41,12 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
-    public function show(Project $project)
+    public function show(Request $request, Project $project)
     {
-        #dd($project);
+        if( !$request->user()->hasAbility('project.view_all') ) {
+            return redirect()->back()->with('error', 'You do not have permission to view this page.');
+        }
+    
         return Inertia::render('Projects/Show', [
             'project' => $project::with('tasks.users')->with('owner')->first(),
         ]);

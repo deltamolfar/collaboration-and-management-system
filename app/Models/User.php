@@ -77,7 +77,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class);
     }
 
-    public function haveAbility($ability): bool
+    public function hasAbility($ability): bool
     {
         return in_array($ability, $this->role->abilities);
     }

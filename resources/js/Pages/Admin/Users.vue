@@ -105,13 +105,13 @@ const dialog = ref(false);
       class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-transparent backdrop-blur-sm"
     >
       <div class="w-1/2">
-        <div class="flex justify-between pl-1 rounded-t-lg dark:bg-gray-700">
-          <h1 class="self-center dark:text-white">{{ updatingDialog ? 'Update user' : 'Create user' }}</h1>
+        <div class="flex justify-between pl-1 bg-gray-500 rounded-t-lg dark:bg-gray-700">
+          <h1 class="self-center p-1 text-lg text-white">{{ updatingDialog ? 'Update user' : 'Create user' }}</h1>
           <button class="w-8 h-8 text-2xl font-black text-center text-white bg-red-500 rounded-tr-lg rounded-bl-lg hover:bg-red-400" @click="dialog = false">X</button>
         </div>
-        <div class="flex flex-col px-2 pb-2 bg-gray-100 rounded-b-lg dark:bg-gray-700">
+        <div class="flex flex-col px-2 pb-2 bg-gray-300 rounded-b-lg dark:bg-gray-700">
           <label class="flex flex-col">
-            <span class="text-white">Name<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
+            <span class="dark:text-white">Name<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
             <input
               v-model="userObj.name"
               class="text-white bg-gray-600 rounded-md shadow-md"
@@ -120,7 +120,7 @@ const dialog = ref(false);
           </label>
           <span class="text-red-500">{{errors.name}}</span>
           <label class="flex flex-col">
-            <span class="text-white">Email<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
+            <span class="dark:text-white">Email<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
             <input
               v-model="userObj.email"
               class="text-white bg-gray-600 rounded-md shadow-md read-only:cursor-not-allowed read-only:bg-gray-400"
@@ -130,7 +130,7 @@ const dialog = ref(false);
           </label>
           <span class="text-red-500">{{errors.email}}</span>
           <label class="flex flex-col">
-            <span class="text-white">Password<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
+            <span class="dark:text-white">Password<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
             <input
               v-model="userObj.password"
               class="text-white bg-gray-600 rounded-md shadow-md"
@@ -139,7 +139,7 @@ const dialog = ref(false);
           </label>
           <span class="text-red-500">{{errors.password}}</span>
           <label class="flex flex-col">
-            <span class="text-white">Role<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
+            <span class="dark:text-white">Role<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
             <select
               v-model="userObj.role"
               class="text-white bg-gray-600 rounded-md shadow-md"
@@ -161,7 +161,7 @@ const dialog = ref(false);
       <button @click="openCreateUser" class="w-full px-4 py-2 text-white bg-blue-500 rounded-t-md hover:bg-blue-400">Create</button>
       <div
         v-for="(user, index) in users" :key="index"
-        class="flex items-center justify-between py-1 bg-gray-700 border-b border-gray-200"
+        class="flex items-center justify-between py-1 bg-gray-300 border-b border-gray-700 dark:border-gray-300 dark:bg-gray-700"
       >
         <div class="flex flex-col h-full px-2">
           <h2>
@@ -175,7 +175,7 @@ const dialog = ref(false);
           </p>
         </div>
         <div class="flex gap-2 px-2">
-          <!-- <button @click="openUpdateUser(user)" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-400">Edit</button> -->
+          <button @click="openUpdateUser(user)" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-400">Edit</button>
           <button @click="deleteUser(user.id)" class="px-4 py-2 text-white bg-red-500 rounded-md">Delete</button>
         </div>
       </div>

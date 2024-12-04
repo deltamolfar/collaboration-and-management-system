@@ -15,8 +15,16 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'accent': 'rgba(240,70,70,255)',
+            }
         },
     },
 
     plugins: [forms],
+
+    safelist: [
+        {pattern: /^bg-(red|blue|green|yellow)-[1-4]00$/, variants: ['hover']},
+        {pattern: /^border-(red|blue|green|yellow)-[1-4]00$/,},
+    ],
 };

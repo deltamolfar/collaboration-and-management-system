@@ -69,7 +69,7 @@ const showingNavigationDropdown = ref(false);
                     <span class="inline-flex rounded-md">
                       <button
                         type="button"
-                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-white transition duration-150 ease-in-out bg-red-200 border border-transparent rounded-md hover:text-red-700 focus:outline-none hover:bg-red-500 dark:bg-red-600 dark:text-gray-400 dark:hover:text-red-300"
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-white transition duration-150 ease-in-out bg-red-400 border border-transparent rounded-md hover:text-white focus:outline-none hover:bg-red-500 dark:bg-red-600 dark:text-gray-400 dark:hover:text-red-300"
                       >
                         New
                       </button>
