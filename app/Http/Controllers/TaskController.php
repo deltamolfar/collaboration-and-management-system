@@ -55,7 +55,7 @@ class TaskController extends Controller
             'name'          => 'required|string|max:255',
             'description'   => 'required|string|max:1024',
             'due_date'      => 'required|date',
-            'assignees'     => 'required|string|min:1',
+            'assignees'     => 'required|array|min:1',
             'status'        => 'required|string|max:255',
         ]);
 

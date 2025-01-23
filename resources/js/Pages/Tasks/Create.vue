@@ -1,17 +1,7 @@
-<script setup lang="ts">
-import { ref } from 'vue';
+<script setup>
 import { useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-
-const form = useForm({
-  name: '',
-  description: '',
-  status: 'open',
-  due_date: '',
-  assignees: [],
-  project_id: '',
-});
 
 const props = defineProps({
   project: {
@@ -24,10 +14,21 @@ const props = defineProps({
   },
 });
 
+const form = useForm({
+  name: '',
+  description: '',
+  status: 'open',
+  due_date: '',
+  assignees: [],
+  project_id: props.project.id,
+});
+
 const submit = () => {
+  form.assignees = form.assignees instanceof Array ? form.assignees : [form.assignees];
+  console.log(form);
   form.post(route('tasks.store', props.project), {
     onSuccess: () => form.reset(),
-    onFail: (data) => {
+    onError: (data) => {
       console.log(data);
     },
   });

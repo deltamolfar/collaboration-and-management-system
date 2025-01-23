@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import {ref} from 'vue';
 
@@ -14,6 +14,8 @@ const props = defineProps({
     required: true
   }
 });
+
+const page = usePage();
 
 function deleteUser (id) {
   if( confirm('Are you sure you want to delete this user?') ) {
@@ -83,15 +85,15 @@ function openCreateUser() {
   dialog.value = true;
 }
 
-// function openUpdateUser(user) {
-//   console.log('openUpdateUser', user);
-//   userObj.name = user.name;
-//   userObj.email = user.email;
-//   userObj.role = user.role;
-//   userObj.password = '';
-//   updatingDialog.value = true;
-//   dialog.value = true;
-// }
+function openUpdateUser(user) {
+  console.log('openUpdateUser', user);
+  userObj.name = user.name;
+  userObj.email = user.email;
+  userObj.role = user.role;
+  userObj.password = '';
+  updatingDialog.value = true;
+  dialog.value = true;
+}
 
 const updatingDialog = ref(false);
 const dialog = ref(false);
@@ -171,7 +173,7 @@ const dialog = ref(false);
             {{ user.email }}
           </p>
           <p>
-            {{ role }}
+            {{ page.props.roles.find((role) => role.id===user.role_id).name }}
           </p>
         </div>
         <div class="flex gap-2 px-2">

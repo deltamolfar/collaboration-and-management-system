@@ -3,8 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 </script>
 
 <template>
-  <AuthenticatedLayout class="h-full">
-    <div class="grid h-full min-h-full grid-cols-12 m-4 mt-2">
+  <AuthenticatedLayout class="h-full min-h-screen">
+    <div style="min-height: 90vh;" class="grid h-full min-h-full grid-cols-12 m-4 mt-2">
       <div class="flex flex-col col-span-4 bg-gray-100 dark:bg-gray-700 rounded-l-md">
         <h1 class="my-2 text-2xl font-extrabold text-center dark:text-white">Admin Dashboard</h1>
         <a :href="route('admin.dashboard')">

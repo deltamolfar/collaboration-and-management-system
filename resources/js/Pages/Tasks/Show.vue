@@ -30,13 +30,14 @@ const props = defineProps({
   }
 });
 
+console.log(props.task);
 const page = usePage();
 const user = page.props.auth.user;
 
-const canEdit = ref(false);// TODO: DIPL ref(user.role.abilities.includes('task.update'));
-const canDelete = ref(false);//TODO: DIPL //ref(user.role.abilities.includes('task.delete'));
-const canComment = ref(false);//TODO: DIPL //ref(user.role.abilities.includes('task.comment'));
-const canLogTime = ref(false);//TODO: DIPL
+const canEdit = ref(true);// TODO: DIPL ref(user.role.abilities.includes('task.update'));
+const canDelete = ref(true);//TODO: DIPL //ref(user.role.abilities.includes('task.delete'));
+const canComment = ref(true);//TODO: DIPL //ref(user.role.abilities.includes('task.comment'));
+const canLogTime = ref(true);//TODO: DIPL
 
 const newComment = ref('');
 const newLog = ref({
@@ -221,26 +222,26 @@ const updateTask = async () => {
 
   <dialog v-show="dialog" class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-transparent backdrop-blur-sm">
     <div class="w-1/2">
-      <div class="flex justify-between pl-2 rounded-t-lg dark:bg-gray-700">
+      <div class="flex justify-between pl-2 bg-gray-200 rounded-t-lg dark:bg-gray-700">
         <h1 class="self-center text-lg font-semibold dark:text-white">Add Time Log</h1>
         <button class="w-8 h-8 text-2xl font-black text-center text-white bg-red-500 rounded-tr-lg rounded-bl-lg hover:bg-red-400" @click="dialog = false">X</button>
       </div>
       <div class="flex flex-col px-2 pb-2 bg-gray-100 rounded-b-lg dark:bg-gray-700">
         <label class="flex flex-col">
-          <span class="text-white">Start Time</span>
-          <input v-model="newLog.time_start" type="datetime-local" class="text-white bg-gray-600 rounded-md shadow-md" />
+          <span class="dark:text-white">Start Time</span>
+          <input v-model="newLog.time_start" type="datetime-local" class="rounded-md shadow-md dark:text-white dark:bg-gray-600" />
         </label>
         <label class="flex flex-col mt-4">
-          <span class="text-white">End Time</span>
-          <input v-model="newLog.time_end" type="datetime-local" class="text-white bg-gray-600 rounded-md shadow-md" />
+          <span class="dark:text-white">End Time</span>
+          <input v-model="newLog.time_end" type="datetime-local" class="rounded-md shadow-md dark:text-white dark:bg-gray-600" />
         </label>
         <label class="flex flex-col mt-4">
-          <span class="text-white">Time Spent (hours)<span class="font-bold text-red-500">*</span></span>
-          <input v-model="newLog.time_spent" type="number" class="text-white bg-gray-600 rounded-md shadow-md" />
+          <span class="dark:text-white">Time Spent (hours)<span class="font-bold text-red-500">*</span></span>
+          <input v-model="newLog.time_spent" type="number" class="rounded-md shadow-md dark:text-white dark:bg-gray-600" />
         </label>
         <label class="flex flex-col mt-4">
-          <span class="text-white">Description</span>
-          <textarea v-model="newLog.description" class="text-white bg-gray-600 rounded-md shadow-md" rows="3"></textarea>
+          <span class="dark:text-white">Description</span>
+          <textarea v-model="newLog.description" class="rounded-md shadow-md dark:text-white dark:bg-gray-600" rows="3"></textarea>
         </label>
         <span class="text-red-500">{{ errors.log }}</span>
         <button @click="submitLog" class="w-full h-10 p-1 mt-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-400">

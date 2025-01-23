@@ -48,7 +48,7 @@ class ProjectController extends Controller
         }
     
         return Inertia::render('Projects/Show', [
-            'project' => $project::with('tasks.users')->with('owner')->first(),
+            'project' => Project::with('tasks.users')->with('owner')->findOrFail($project->id),
         ]);
     }
 

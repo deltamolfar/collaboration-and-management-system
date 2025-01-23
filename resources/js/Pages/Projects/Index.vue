@@ -15,7 +15,7 @@ const props = defineProps({
   <AuthenticatedLayout>
     <div class="p-2">
       <h2 class="mb-4 text-2xl font-bold dark:text-white">Projects Overview</h2>
-      <div class="flex flex-col w-full" v-if="projects.length>0">
+      <div class="flex flex-col w-full gap-1" v-if="projects.length>0">
         <a
           v-for="project in projects"
           :key="project.id"
@@ -26,7 +26,7 @@ const props = defineProps({
             <h3 class="text-xl font-semibold">{{ project.name }}</h3>
             <p class="text-gray-600">{{ project.description }}</p>
           </div>
-          <p>{{ project.status }}</p>
+          <p :class="'status_'+project.status">{{ project.status }}</p>
           <p>{{ project.updated_at }}</p>
         </a>
       </div>
@@ -36,3 +36,13 @@ const props = defineProps({
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+.status_open {
+  @apply rounded-md bg-green-600 text-green-100 font-mono font-medium px-2 uppercase;
+}
+
+.status_closed {
+  @apply rounded-md bg-red-600 text-red-100 font-mono font-medium px-2 uppercase;
+}
+</style>
