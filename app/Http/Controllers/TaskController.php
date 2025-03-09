@@ -9,15 +9,91 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function index (Request $request) {
-        $project = $request->input('project');
-        if(!$project) {
-            return Inertia::render('Errors/404');
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $hasViewAllPermission = $user->hasAbility('project.view_all');
+        
+        // Base query
+        $query = Task::query()
+            ->with(['project', 'users'])
+            ->select('tasks.*');
+            
+        // Apply access restrictions unless user has view_all permission
+        if (!$hasViewAllPermission) {
+            $query->where(function($q) use ($user) {
+                // Tasks assigned to the user
+                $q->whereHas('users', function($query) use ($user) {
+                    $query->where('users.id', $user->id);
+                });
+                
+                // Or tasks in projects where the user is a member
+                $q->orWhereHas('project', function($query) use ($user) {
+                    $query->whereHas('users', function($subQuery) use ($user) {
+                        $subQuery->where('users.id', $user->id);
+                    });
+                });
+            });
         }
-
+        
+        // Apply filters
+        $status = $request->get('status');
+        if ($status) {
+            $query->where('status', $status);
+        }
+        
+        $projectId = $request->get('project');
+        if ($projectId) {
+            $query->where('project_id', $projectId);
+        }
+        
+        $filter = $request->get('filter');
+        if ($filter === 'upcoming') {
+            $query->where('due_date', '>=', now())
+                  ->where('due_date', '<=', now()->addDays(7))
+                  ->where('status', '!=', 'completed');
+        } elseif ($filter === 'overdue') {
+            $query->where('due_date', '<', now())
+                  ->where('status', '!=', 'completed');
+        } elseif ($filter === 'completed') {
+            $query->where('status', 'completed');
+        }
+        
+        // Search functionality
+        $search = $request->get('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Sort by due date by default (closest first)
+        $sortBy = $request->get('sort_by', 'due_date');
+        $sortOrder = $request->get('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
+        
+        // Get all projects for the filter dropdown
+        $projects = $hasViewAllPermission 
+            ? Project::select('id', 'name')->get() 
+            : Project::whereHas('users', function($q) use ($user) {
+                $q->where('users.id', $user->id);
+              })->select('id', 'name')->get();
+        
         return Inertia::render('Tasks/Index', [
-            'project' => $project,
-            'tasks' => $project->tasks()->get(),
+            'tasks' => $query->paginate(10),
+            'filters' => [
+                'status' => $status,
+                'project' => $projectId,
+                'filter' => $filter,
+                'search' => $search,
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'projects' => $projects,
+            'can' => [
+                'viewAll' => $hasViewAllPermission,
+            ]
         ]);
     }
 

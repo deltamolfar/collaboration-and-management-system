@@ -16,6 +16,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function() {
         return redirect()->route('dashboard');
     });
+
     Route::get('/timesheet', [DashboardController::class, 'timesheet'])->name('timesheet');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
-    Route::get('/projects/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('/projects/{project}/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('/projects/{project}/tasks/create', [TaskController::class, 'store'])->name('tasks.store');
     Route::get('/projects/{project}/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');

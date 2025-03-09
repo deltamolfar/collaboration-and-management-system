@@ -17,12 +17,11 @@ class Role extends Model
         'abilities' => 'array',
     ];
 
-    const ability_list = [
+    public const ability_list = [
         'task.create',
         'task.update',
         'task.delete',
         'task.log',
-        'task.manage_log',
         'task.comment',
         'project.create',
         'project.update',
