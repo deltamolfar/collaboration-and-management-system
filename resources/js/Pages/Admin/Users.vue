@@ -2,7 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import {ref} from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
   users: {
@@ -17,22 +17,21 @@ const props = defineProps({
 
 const page = usePage();
 
-function deleteUser (id) {
-  if( confirm('Are you sure you want to delete this user?') ) {
+function deleteUser(id) {
+  if (confirm('Are you sure you want to delete this user?')) {
     axios.delete(route('admin.users.destroy', id))
-      .then((data) => {
-        console.log('delete user', data);
+      .then(() => {
+        location.reload();
       });
   }
-  location.reload();
 }
 
-const userObj = {
+const userObj = ref({
   name: '',
   email: '',
   password: '',
   role: ''
-};
+});
 
 const errors = ref({
   name: null,
@@ -42,55 +41,48 @@ const errors = ref({
 });
 
 async function createUser() {
-  if(!userObj.name || !userObj.email || !userObj.password || !userObj.role) {
+  if (!userObj.value.name || !userObj.value.email || !userObj.value.password || !userObj.value.role) {
     alert('Please fill all fields');
     return;
   }
 
-  const valid = await axios.post(route('admin.users.store'), {
-    ...userObj
-  }).then(data => {
-    console.log('create user', data);
-    return true;
-  }).catch(error => {
-    console.log('error', error.response.data.errors);
-    errors.value.name = error.response.data.errors?.name?.[0];
-    errors.value.email = error.response.data.errors?.email?.[0];
-    errors.value.password = error.response.data.errors?.password?.[0];
-    errors.value.role = error.response.data.errors?.role?.[0];
-    return false;
-  });
-  if( !valid ){ return; }
+  const valid = await axios.post(route('admin.users.store'), userObj.value)
+    .then(() => {
+      return true;
+    })
+    .catch(error => {
+      const responseErrors = error.response.data.errors;
+      errors.value.name = responseErrors?.name?.[0];
+      errors.value.email = responseErrors?.email?.[0];
+      errors.value.password = responseErrors?.password?.[0];
+      errors.value.role = responseErrors?.role?.[0];
+      return false;
+    });
+
+  if (!valid) return;
 
   dialog.value = false;
   location.reload();
 }
 
-// function updateUser(id) {
-//   axios.put(route('admin.users.update', id), {
-//     ...userObj
-//   }).then(data => {
-//     console.log('update user', data);
-//   });
-// }
-
 function openCreateUser() {
-  console.log('openCreateUser');
-  userObj.name = '';
-  userObj.email = '';
-  userObj.role = '';
-  userObj.password = '';
-
+  userObj.value = {
+    name: '',
+    email: '',
+    password: '',
+    role: ''
+  };
   updatingDialog.value = false;
   dialog.value = true;
 }
 
 function openUpdateUser(user) {
-  console.log('openUpdateUser', user);
-  userObj.name = user.name;
-  userObj.email = user.email;
-  userObj.role = user.role;
-  userObj.password = '';
+  userObj.value = {
+    name: user.name,
+    email: user.email,
+    password: '',
+    role: user.role_id
+  };
   updatingDialog.value = true;
   dialog.value = true;
 }
@@ -101,87 +93,61 @@ const dialog = ref(false);
 
 <template>
   <AdminLayout>
-    <template #header><span class="w-full text-lg font-bold text-center"> Users </span></template>
-    <dialog
-      v-show="dialog"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-transparent backdrop-blur-sm"
-    >
-      <div class="w-1/2">
-        <div class="flex justify-between pl-1 bg-gray-500 rounded-t-lg dark:bg-gray-700">
-          <h1 class="self-center p-1 text-lg text-white">{{ updatingDialog ? 'Update user' : 'Create user' }}</h1>
-          <button class="w-8 h-8 text-2xl font-black text-center text-white bg-red-500 rounded-tr-lg rounded-bl-lg hover:bg-red-400" @click="dialog = false">X</button>
+    <template #header>
+      <h1 class="mb-4 text-3xl font-bold">Users</h1>
+    </template>
+    <div>
+      <button @click="openCreateUser" class="px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-400">Create User</button>
+      <div v-for="(user, index) in users" :key="index" class="p-4 mb-4 bg-white rounded shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">{{ user.name }}</h2>
+            <p>{{ user.email }}</p>
+            <p>{{ roles.find(role => role.id === user.role_id)?.name }}</p>
+          </div>
+          <div class="flex gap-2">
+            <button @click="openUpdateUser(user)" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-400">Edit</button>
+            <button @click="deleteUser(user.id)" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-400">Delete</button>
+          </div>
         </div>
-        <div class="flex flex-col px-2 pb-2 bg-gray-300 rounded-b-lg dark:bg-gray-700">
-          <label class="flex flex-col">
-            <span class="dark:text-white">Name<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
-            <input
-              v-model="userObj.name"
-              class="text-white bg-gray-600 rounded-md shadow-md"
-              placeholder="Name"
-            />
-          </label>
-          <span class="text-red-500">{{errors.name}}</span>
-          <label class="flex flex-col">
-            <span class="dark:text-white">Email<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
-            <input
-              v-model="userObj.email"
-              class="text-white bg-gray-600 rounded-md shadow-md read-only:cursor-not-allowed read-only:bg-gray-400"
-              placeholder="Email"
-              :readonly="updatingDialog"
-            />
-          </label>
-          <span class="text-red-500">{{errors.email}}</span>
-          <label class="flex flex-col">
-            <span class="dark:text-white">Password<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
-            <input
-              v-model="userObj.password"
-              class="text-white bg-gray-600 rounded-md shadow-md"
-              placeholder="Password"
-            />
-          </label>
-          <span class="text-red-500">{{errors.password}}</span>
-          <label class="flex flex-col">
-            <span class="dark:text-white">Role<span v-if="!updatingDialog" class="font-bold text-red-500">*</span></span>
-            <select
-              v-model="userObj.role"
-              class="text-white bg-gray-600 rounded-md shadow-md"
-            >
-              <option v-for="(role, index) in roles" :key="index" :value="role.id">{{ role.name }}</option>
+      </div>
+    </div>
+
+    <dialog v-show="dialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="w-1/2 p-6 bg-white rounded shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">{{ updatingDialog ? 'Update User' : 'Create User' }}</h2>
+          <button @click="dialog = false" class="text-xl font-bold">&times;</button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-1">Name</label>
+            <input v-model="userObj.name" class="w-full p-2 border rounded" />
+            <span class="text-red-500">{{ errors.name }}</span>
+          </div>
+          <div>
+            <label class="block mb-1">Email</label>
+            <input v-model="userObj.email" class="w-full p-2 border rounded" :readonly="updatingDialog" />
+            <span class="text-red-500">{{ errors.email }}</span>
+          </div>
+          <div>
+            <label class="block mb-1">Password</label>
+            <input v-model="userObj.password" type="password" class="w-full p-2 border rounded" />
+            <span class="text-red-500">{{ errors.password }}</span>
+          </div>
+          <div>
+            <label class="block mb-1">Role</label>
+            <select v-model="userObj.role" class="w-full p-2 border rounded">
+              <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
             </select>
-          </label>
-          <span class="text-red-500">{{errors.role}}</span>
-          <button
-            @click="createUser"
-            class="w-full h-10 p-1 mt-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-400"
-          >
-            Create
+            <span class="text-red-500">{{ errors.role }}</span>
+          </div>
+          <button @click="createUser" class="w-full py-2 text-white bg-blue-500 rounded hover:bg-blue-400">
+            {{ updatingDialog ? 'Update' : 'Create' }}
           </button>
         </div>
       </div>
     </dialog>
-    <div class="">
-      <button @click="openCreateUser" class="w-full px-4 py-2 text-white bg-blue-500 rounded-t-md hover:bg-blue-400">Create</button>
-      <div
-        v-for="(user, index) in users" :key="index"
-        class="flex items-center justify-between py-1 bg-gray-300 border-b border-gray-700 dark:border-gray-300 dark:bg-gray-700"
-      >
-        <div class="flex flex-col h-full px-2">
-          <h2>
-            {{ user.name }}
-          </h2>
-          <p>
-            {{ user.email }}
-          </p>
-          <p>
-            {{ page.props.roles.find((role) => role.id===user.role_id).name }}
-          </p>
-        </div>
-        <div class="flex gap-2 px-2">
-          <button @click="openUpdateUser(user)" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-400">Edit</button>
-          <button @click="deleteUser(user.id)" class="px-4 py-2 text-white bg-red-500 rounded-md">Delete</button>
-        </div>
-      </div>
-    </div>
   </AdminLayout>
 </template>
 

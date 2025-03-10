@@ -1,39 +1,43 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const user = page.props.auth.user;
 </script>
 
 <template>
   <AuthenticatedLayout class="h-full min-h-screen">
-    <div style="min-height: 90vh;" class="grid h-full min-h-full grid-cols-12 m-4 mt-2">
-      <div class="flex flex-col col-span-4 bg-gray-100 dark:bg-gray-700 rounded-l-md">
-        <h1 class="my-2 text-2xl font-extrabold text-center dark:text-white">Admin Dashboard</h1>
-        <a :href="route('admin.dashboard')">
-            <div class="rounded-t-md page-btn">Dashboard</div>
-        </a>
-        <a :href="route('admin.users.index')">
-            <div class="rounded-t-md page-btn">Users</div>
-        </a>
-        <a :href="route('admin.roles.index')">
-            <div class="page-btn">Roles</div>
-        </a>
-        <a :href="route('admin.settings.index')">
-            <div class="rounded-b-md page-btn">Miscellaneous</div>
-        </a>
-      </div>
-      <div class="col-span-8 p-2 bg-gray-200 dark:text-white dark:bg-gray-600 rounded-r-md">
+    <div class="flex h-full min-h-full">
+      <aside class="w-1/4 p-4 text-white bg-gray-800">
+        <h1 class="mb-4 text-2xl font-bold">Admin Dashboard</h1>
+        <nav>
+          <ul>
+            <li class="mb-2">
+              <a :href="route('admin.dashboard')" class="block px-4 py-2 rounded hover:bg-gray-700">Dashboard</a>
+            </li>
+            <li class="mb-2">
+              <a :href="route('admin.users.index')" class="block px-4 py-2 rounded hover:bg-gray-700">Users</a>
+            </li>
+            <li class="mb-2">
+              <a :href="route('admin.roles.index')" class="block px-4 py-2 rounded hover:bg-gray-700">Roles</a>
+            </li>
+            <li class="mb-2">
+              <a :href="route('admin.settings.index')" class="block px-4 py-2 rounded hover:bg-gray-700">Settings</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="w-3/4 p-4 bg-gray-100">
         <slot name="header" />
         <slot />
-      </div>
+      </main>
     </div>
   </AuthenticatedLayout>
 </template>
 
 <style scoped>
-.page-btn {
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  @apply hover:bg-gray-500 m-0 dark:text-white font-semibold text-lg;
+aside {
+  min-height: 100vh;
 }
 </style>

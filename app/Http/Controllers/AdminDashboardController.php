@@ -15,7 +15,7 @@ class AdminDashboardController extends Controller
 
     public function globalSettingsIndex()
     {
-        return Inertia::render('Admin/GlobalSettings/Index');
+        return Inertia::render('Admin/Misc');
     }
 
     public function globalSettingsUpdate(Request $request)

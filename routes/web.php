@@ -52,8 +52,8 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
             Route::group(['prefix' => 'settings'], function () {
-                Route::get('/', [AdminDashboardController::class, 'settings'])->name('admin.settings.index');
-                Route::put('/', [AdminDashboardController::class, 'updateSettings'])->name('admin.settings.update');
+                Route::get('/', [AdminDashboardController::class, 'globalSettingsIndex'])->name('admin.settings.index');
+                Route::put('/', [AdminDashboardController::class, 'globalSettingsUpdate'])->name('admin.settings.update');
 
                 Route::get('/users', [AdminDashboardController::class, 'users'])->name('admin.users.index');
                 Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -63,7 +63,6 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles.index');
                 Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
-                Route::get('/roles/{role}', [RoleController::class, 'edit'])->name('admin.roles.edit');
                 Route::put('/roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
                 Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
             });

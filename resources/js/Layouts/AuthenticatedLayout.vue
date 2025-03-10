@@ -74,26 +74,6 @@ const showingNavigationDropdown = ref(false);
                   <span class="inline-flex rounded-md">
                     <button
                       type="button"
-                      class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-white transition duration-150 ease-in-out bg-red-400 border border-transparent rounded-md hover:text-white focus:outline-none hover:bg-red-500 dark:bg-red-600 dark:text-gray-400 dark:hover:text-red-300"
-                    >
-                      New
-                    </button>
-                  </span>
-                </template>
-
-                <template #content>
-                  <DropdownLink
-                    :href="route('projects.create')"
-                  >
-                    Project
-                  </DropdownLink>
-                </template>
-              </Dropdown>
-              <Dropdown align="right" width="48">
-                <template #trigger>
-                  <span class="inline-flex rounded-md">
-                    <button
-                      type="button"
                       class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
                     >
                       {{ $page.props.auth.user.name }}

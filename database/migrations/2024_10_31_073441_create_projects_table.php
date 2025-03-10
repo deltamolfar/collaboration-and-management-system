@@ -22,12 +22,12 @@ return new class extends Migration
 
         \App\Models\GlobalSetting::create([
             'key' => 'project_statuses',
-            'value' => '{"open":"#008000","closed":"#FF0000"}',
+            'value' => '{"open":"#008000","closed":"#FF0000","in_progress":"#FFA500","paused":"#FFFF00","completed":"#0000FF"}',
         ]);
 
         \App\Models\GlobalSetting::create([
             'key' => 'task_statuses',
-            'value' => '{"open":"#008000","closed":"#FF0000"}',
+            'value' => '{"open":"#008000","closed":"#FF0000","in_progress":"#FFA500","paused":"#FFFF00","completed":"#0000FF"}',
         ]);
     }
 

@@ -9,11 +9,7 @@ use Inertia\Inertia;
 class RoleController extends Controller
 {
     public function index (Request $request) {
-        return Inertia::render('Role/Index');
-    }
-
-    public function create () {
-        return Inertia::render('Role/Create');
+        return Inertia::render('Admin/Roles');
     }
 
     public function store (Request $request) {
@@ -21,7 +17,7 @@ class RoleController extends Controller
             'api_name' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'abilities' => 'required|array|in:' . implode(',', Role::$abilities),
+            'abilities' => 'required|array|in:' . implode(',', Role::ability_list),
         ]);
 
         Role::create($request->all());

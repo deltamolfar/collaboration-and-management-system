@@ -535,6 +535,7 @@ const updateTask = async () => {
         </div>
       </div>
     </div>
+
     <!-- Time Log Dialog -->
     <div v-if="dialog" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75">
       <div class="relative px-4 pt-5 pb-4 mx-auto text-left bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg">

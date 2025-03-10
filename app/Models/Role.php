@@ -27,6 +27,7 @@ class Role extends Model
         'project.update',
         'project.delete',
         'project.assign',
+        'project.manage',
         'project.view_all',
         'role.create',
         'role.update',
