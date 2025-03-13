@@ -16,8 +16,7 @@ return new class extends Migration
 
             $table->string('action');
             $table->string('url');
-            $table->string('header_key')->nullable();
-            $table->string('header_value')->nullable();
+            $table->json('headers')->nullable();
 
             $table->timestamps();
         });

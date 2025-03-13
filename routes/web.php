@@ -9,6 +9,7 @@ use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskLogController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -65,6 +66,11 @@ Route::middleware('auth')->group(function () {
                 Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
                 Route::put('/roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
                 Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
+
+                Route::get('/webhooks', [WebhookController::class, 'index'])->name('admin.webhooks.index');
+                Route::post('/webhooks', [WebhookController::class, 'store'])->name('admin.webhooks.store');
+                Route::put('/webhooks/{webhook}', [WebhookController::class, 'update'])->name('admin.webhooks.update');
+                Route::delete('/webhooks/{webhook}', [WebhookController::class, 'destroy'])->name('admin.webhooks.destroy');
             });
         });
 });

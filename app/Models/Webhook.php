@@ -9,7 +9,23 @@ class Webhook extends Model
     protected $fillable = [
         'action',
         'url',
-        'header_key',
-        'header_value',
+        'headers',
     ];
+
+    protected $casts = [
+        'headers' => 'array',
+    ];
+
+    static public function execute($action, $data)
+    {
+        $webhooks = Webhook::where('action', $action)->get();
+
+        foreach ($webhooks as $webhook) {
+            $client = new \GuzzleHttp\Client();
+            $client->post($webhook->url, [
+                'headers' => $webhook->headers,
+                'json' => $data,
+            ]);
+        }
+    }
 }
