@@ -96,8 +96,6 @@ class ProjectController extends Controller
     public function create()
     {
         return Inertia::render('Projects/Create', [
-            'statuses' => \App\Models\GlobalSetting::where('key', 'project_statuses')
-                ->first()->value,
             'users' => User::all(),
         ]);
     }

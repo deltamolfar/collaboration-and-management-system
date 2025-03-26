@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\DashboardApiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
@@ -16,6 +17,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', function() {
         return redirect()->route('dashboard');
+    });
+
+    Route::prefix('dashboard')->group(function() {
+        Route::get('/stats', [DashboardApiController::class, 'stats'])
+            ->name('api.dashboard.stats');
+        Route::get('/activity', [DashboardApiController::class, 'activity'])
+            ->name('api.dashboard.activity');
+        Route::get('/upcoming-tasks', [DashboardApiController::class, 'upcomingTasks'])
+            ->name('api.dashboard.upcoming-tasks');
     });
 
     Route::get('/timesheet', [DashboardController::class, 'timesheet'])->name('timesheet');

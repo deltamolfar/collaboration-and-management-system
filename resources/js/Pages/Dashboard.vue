@@ -18,7 +18,6 @@ const stats = ref({
 });
 const recentActivity = ref([]);
 const upcomingTasks = ref([]);
-const announcements = ref([]);
 const loading = ref(true);
 
 // Get time of day for greeting
@@ -49,23 +48,20 @@ const daysRemaining = (dueDate) => {
 // Load dashboard data
 onMounted(async () => {
   try {
-    // Fetch dashboard data (these endpoints would need to be created)
-    const [statsData, activityData, tasksData, announcementsData] = await Promise.all([
+    const [statsData, activityData, tasksData] = await Promise.all([
       axios.get(route('api.dashboard.stats')).catch(() => ({ data: { 
-        totalProjects: 5, 
-        totalTasks: 23, 
-        completedTasks: 15, 
-        upcomingDeadlines: 3 
+        totalProjects: -1, 
+        totalTasks: -1, 
+        completedTasks: -1, 
+        upcomingDeadlines: -1 
       }})),
       axios.get(route('api.dashboard.activity')).catch(() => ({ data: [] })),
       axios.get(route('api.dashboard.upcoming-tasks')).catch(() => ({ data: [] })),
-      axios.get(route('api.dashboard.announcements')).catch(() => ({ data: [] })),
     ]);
     
     stats.value = statsData.data;
     recentActivity.value = activityData.data;
     upcomingTasks.value = tasksData.data;
-    announcements.value = announcementsData.data;
   } catch (error) {
     console.error('Error loading dashboard data:', error);
   } finally {
@@ -192,137 +188,98 @@ onMounted(async () => {
         <!-- Main Content Grid -->
         <div class="grid grid-cols-1 gap-6 mt-6 lg:grid-cols-3">
           <!-- Upcoming Tasks -->
-          <div class="col-span-2 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-            <div class="p-6">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Upcoming Tasks</h3>
-              <div class="mt-4" v-if="loading">
-                <div class="flex items-center justify-center h-40">
-                  <svg class="w-8 h-8 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </div>
+          <div class="col-span-2 p-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Upcoming Tasks</h3>
+            <div class="mt-4" v-if="loading">
+              <div class="flex items-center justify-center h-40">
+                <svg class="w-8 h-8 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
               </div>
-              <div v-else-if="upcomingTasks.length === 0" class="flex items-center justify-center h-40">
-                <p class="text-gray-500 dark:text-gray-400">No upcoming tasks.</p>
-              </div>
-              <ul v-else class="mt-4 space-y-4">
-                <li v-for="task in upcomingTasks" :key="task.id" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-                  <div class="flex items-start justify-between">
-                    <div>
-                      <h4 class="font-medium text-gray-900 text-md dark:text-gray-100">{{ task.name }}</h4>
-                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{{ task.description }}</p>
-                      <div class="flex items-center mt-2 space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                        <div class="flex items-center">
-                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                          </svg>
-                          <span>Due: {{ formatDate(task.due_date) }}</span>
-                        </div>
-                        <div class="flex items-center">
-                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                          </svg>
-                          <span>{{ task.comments_count || 0 }} comments</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <span :class="{
-                        'px-2 py-1 text-xs font-medium rounded-full': true,
-                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': daysRemaining(task.due_date) <= 1,
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': daysRemaining(task.due_date) > 1 && daysRemaining(task.due_date) <= 3,
-                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': daysRemaining(task.due_date) > 3,
-                      }">
-                        {{ daysRemaining(task.due_date) <= 0 ? 'Due today' : 
-                           daysRemaining(task.due_date) === 1 ? 'Tomorrow' : 
-                          `${daysRemaining(task.due_date)} days left` }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="flex justify-end mt-3">
-                    <Link :href="route('tasks.show', { project: task.project_id, task: task.id })" class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                      View task →
-                    </Link>
-                  </div>
-                </li>
-              </ul>
             </div>
-          </div>
-
-          <!-- Recent Activity & Announcements -->
-          <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-            <div class="p-6">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Recent Activity</h3>
-              <div class="mt-4" v-if="loading">
-                <div class="flex items-center justify-center h-20">
-                  <svg class="w-6 h-6 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </div>
-              </div>
-              <div v-else-if="recentActivity.length === 0" class="flex items-center justify-center h-20">
-                <p class="text-gray-500 dark:text-gray-400">No recent activity.</p>
-              </div>
-              <ul v-else class="mt-4 space-y-3">
-                <li v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
-                  <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full dark:bg-gray-700">
-                      <svg v-if="activity.type.includes('task')" class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                      </svg>
-                      <svg v-else-if="activity.type.includes('comment')" class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                      </svg>
-                      <svg v-else class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                      </svg>
+            <div v-else-if="upcomingTasks.length === 0" class="flex items-center justify-center h-40">
+              <p class="text-gray-500 dark:text-gray-400">No upcoming tasks.</p>
+            </div>
+            <ul v-else class="mt-4 space-y-4">
+              <li v-for="task in upcomingTasks" :key="task.id" class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-medium text-gray-900 text-md dark:text-gray-100">{{ task.name }}</h4>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{{ task.description }}</p>
+                    <div class="flex items-center mt-2 space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Due: {{ formatDate(task.due_date) }}</span>
+                      </div>
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                        <span>{{ task.comments_count || 0 }} comments</span>
+                      </div>
                     </div>
                   </div>
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      <span class="font-medium text-gray-900 dark:text-gray-200">{{ activity.user_name }}</span>
-                      {{ activity.description }}
-                    </p>
-                    <span class="text-xs text-gray-500 dark:text-gray-500">{{ formatDate(activity.created_at) }}</span>
+                    <span :class="{
+                      'px-2 py-1 text-xs font-medium rounded-full': true,
+                      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': daysRemaining(task.due_date) <= 1,
+                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': daysRemaining(task.due_date) > 1 && daysRemaining(task.due_date) <= 3,
+                      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': daysRemaining(task.due_date) > 3,
+                    }">
+                      {{ daysRemaining(task.due_date) <= 0 ? 'Due today' : 
+                          daysRemaining(task.due_date) === 1 ? 'Tomorrow' : 
+                        `${daysRemaining(task.due_date)} days left` }}
+                    </span>
                   </div>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Announcements Section -->
-            <div class="px-6 pt-2 pb-6 border-t border-gray-200 dark:border-gray-700">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Announcements</h3>
-              <div class="mt-4" v-if="loading">
-                <div class="flex items-center justify-center h-20">
-                  <svg class="w-6 h-6 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
                 </div>
-              </div>
-              <div v-else-if="announcements.length === 0" class="p-4 mt-4 border border-blue-200 rounded-md bg-blue-50 dark:bg-blue-900/20 dark:border-blue-900">
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                <div class="flex justify-end mt-3">
+                  <Link :href="route('tasks.show', { project: task.project_id, task: task.id })" class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                    View task →
+                  </Link>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Recent Activity & Announcements -->
+          <div class="p-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Recent Activity</h3>
+            <div v-if="loading" class="flex items-center justify-center h-20 mt-4">
+              <svg class="w-6 h-6 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <div v-else-if="recentActivity.length === 0" class="flex items-center justify-center h-20">
+              <p class="text-gray-500 dark:text-gray-400">No recent activity.</p>
+            </div>
+            <ul v-else class="mt-4 space-y-3">
+              <li v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                  <div class="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full dark:bg-gray-700">
+                    <svg v-if="activity.type.includes('task')" class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <svg v-else-if="activity.type.includes('comment')" class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                    <svg v-else class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                     </svg>
                   </div>
-                  <div class="ml-3 text-sm text-blue-700 dark:text-blue-300">
-                    <p>Welcome to your project management dashboard!</p>
-                    <p class="mt-1">Start by creating a new project or task.</p>
-                  </div>
                 </div>
-              </div>
-              <ul v-else class="mt-4 space-y-3">
-                <li v-for="announcement in announcements" :key="announcement.id" class="p-3 border border-blue-200 rounded-md bg-blue-50 dark:bg-blue-900/20 dark:border-blue-900">
-                  <h4 class="font-medium text-blue-800 dark:text-blue-300">{{ announcement.title }}</h4>
-                  <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">{{ announcement.content }}</p>
-                  <p class="mt-1 text-xs text-blue-600 dark:text-blue-500">{{ formatDate(announcement.created_at) }}</p>
-                </li>
-              </ul>
-            </div>
+                <div>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <span class="font-medium text-gray-900 dark:text-gray-200">{{ activity.user_name }}</span>
+                    {{ activity.description }}
+                  </p>
+                  <span class="text-xs text-gray-500 dark:text-gray-500">{{ formatDate(activity.created_at) }}</span>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

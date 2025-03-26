@@ -21,7 +21,7 @@ const user = page.props.auth.user;
             </li>
             <li class="mb-2">
               <a :href="route('admin.roles.index')" class="block px-4 py-2 rounded hover:bg-gray-700">Roles</a>
-            </li><div class="p-4 bg-white rounded shadow">
+            </li>
             <li class="mb-2">
               <a :href="route('admin.webhooks.index')" class="block px-4 py-2 rounded hover:bg-gray-700">Webhooks</a>
             </li>

@@ -1,4 +1,5 @@
 <?php
+// filepath: /home/deltamolfar/Documents/Dev/deltamolfar/pnu-diplom/app/Http/Controllers/DashboardApiController.php
 
 namespace App\Http\Controllers;
 
@@ -12,30 +13,49 @@ class DashboardApiController extends Controller
     public function stats(Request $request)
     {
         $user = $request->user();
-        $hasViewAllPermission = $user->hasAbility('project.view_all');
+        $canViewAll = $user->role->abilities && in_array('project.view_all', $user->role->abilities);
         
+        // Base queries
         $projectsQuery = Project::query();
         $tasksQuery = Task::query();
         
         // Apply access restrictions if needed
-        if (!$hasViewAllPermission) {
-            $projectsQuery->where('user_id', $user->id);
-            $tasksQuery->whereHas('project', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+        if (!$canViewAll) {
+            // Only show projects owned by user or where user is assigned to tasks
+            $projectsQuery->where(function($query) use ($user) {
+                $query->where('user_id', $user->id)
+                      ->orWhereHas('tasks', function($q) use ($user) {
+                          $q->whereHas('users', function($q2) use ($user) {
+                              $q2->where('users.id', $user->id);
+                          });
+                      });
+            });
+            
+            // Only show tasks assigned to user
+            $tasksQuery->whereHas('users', function($query) use ($user) {
+                $query->where('users.id', $user->id);
             });
         }
         
-        // Get upcoming deadlines (tasks due in the next 7 days)
+        // Count upcoming deadlines (due in next 7 days)
         $upcomingDeadlines = $tasksQuery->clone()
             ->where('status', '!=', 'completed')
             ->whereDate('due_date', '>=', now())
             ->whereDate('due_date', '<=', now()->addDays(7))
             ->count();
+            
+        // Count completed tasks
+        $completedTasks = $tasksQuery->clone()
+            ->where('status', 'completed')
+            ->count();
+        
+        // Total tasks
+        $totalTasks = $tasksQuery->count();
         
         return response()->json([
             'totalProjects' => $projectsQuery->count(),
-            'totalTasks' => $tasksQuery->count(),
-            'completedTasks' => $tasksQuery->clone()->where('status', 'completed')->count(),
+            'totalTasks' => $totalTasks,
+            'completedTasks' => $completedTasks,
             'upcomingDeadlines' => $upcomingDeadlines
         ]);
     }
@@ -43,43 +63,48 @@ class DashboardApiController extends Controller
     public function activity(Request $request)
     {
         $user = $request->user();
-        $hasViewAllPermission = $user->hasAbility('project.view_all');
+        $canViewAll = $user->role->abilities && in_array('project.view_all', $user->role->abilities);
         
-        // Get recent activity (tasks created/updated, comments, etc.)
-        $activities = collect();
-        
-        // Get recent task updates
-        $tasks = Task::when(!$hasViewAllPermission, function($query) use ($user) {
-                $query->whereHas('project', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
+        // Get recently created or updated tasks
+        $tasks = Task::with(['project.owner'])
+            ->when(!$canViewAll, function($query) use ($user) {
+                // Only show tasks assigned to user or from user's projects
+                $query->where(function($q) use ($user) {
+                    $q->whereHas('users', function($q2) use ($user) {
+                        $q2->where('users.id', $user->id);
+                    })
+                    ->orWhereHas('project', function($q2) use ($user) {
+                        $q2->where('user_id', $user->id);
+                    });
                 });
             })
             ->latest()
-            ->take(5)
+            ->limit(5)
             ->get()
-            ->map(function($task) {
-                return [
-                    'id' => 'task-' . $task->id,
+            ->map(fn($task): array => [
+                    'id' => "task-$task->id",
                     'type' => 'task',
-                    'user_name' => $task->project->owner->name ?? 'Unknown',
+                    'user_name' => $task->user->name ?? 'Unknown',
                     'description' => "created task '{$task->name}' in project '{$task->project->name}'",
                     'created_at' => $task->created_at
-                ];
-            });
-        
-        $activities = $activities->concat($tasks);
+                ]
+            );
         
         // Get recent comments
-        $comments = TaskComment::whereHas('task', function($query) use ($user, $hasViewAllPermission) {
-                $query->whereHas('project', function($query) use ($user, $hasViewAllPermission) {
-                    if (!$hasViewAllPermission) {
-                        $query->where('user_id', $user->id);
-                    }
+        $comments = TaskComment::with(['task.project', 'user'])
+            ->when(!$canViewAll, function($query) use ($user) {
+                // Only show comments on tasks assigned to user or from user's projects
+                $query->whereHas('task', function($q) use ($user) {
+                    $q->whereHas('users', function($q2) use ($user) {
+                        $q2->where('users.id', $user->id);
+                    })
+                    ->orWhereHas('project', function($q2) use ($user) {
+                        $q2->where('user_id', $user->id);
+                    });
                 });
             })
-            ->with(['task.project', 'user'])
             ->latest()
-            ->take(5)
+            ->limit(5)
             ->get()
             ->map(function($comment) {
                 return [
@@ -91,60 +116,51 @@ class DashboardApiController extends Controller
                 ];
             });
         
-        $activities = $activities->concat($comments);
+        // Combine and sort by date
+        $activity = $tasks->concat($comments)
+            ->sortByDesc('created_at')
+            ->values()
+            ->take(10);
         
-        // Sort by created_at and take the most recent 10
-        $activities = $activities->sortByDesc('created_at')->take(10)->values();
-        
-        return response()->json($activities);
+        return response()->json($activity);
     }
     
     public function upcomingTasks(Request $request)
     {
         $user = $request->user();
-        $hasViewAllPermission = $user->hasAbility('project.view_all');
+        $canViewAll = $user->role->abilities && in_array('project.view_all', $user->role->abilities);
         
         $tasks = Task::with(['project', 'comments'])
-            ->when(!$hasViewAllPermission, function($query) use ($user) {
-                $query->whereHas('project', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
+            ->when(!$canViewAll, function($query) use ($user) {
+                // Only show tasks assigned to user or from user's projects
+                $query->where(function($q) use ($user) {
+                    $q->whereHas('users', function($q2) use ($user) {
+                        $q2->where('users.id', $user->id);
+                    })
+                    ->orWhereHas('project', function($q2) use ($user) {
+                        $q2->where('user_id', $user->id);
+                    });
                 });
             })
-            ->where(function($query) {
-                $query->where('status', '!=', 'completed')
-                      ->whereNotNull('due_date')
-                      ->whereDate('due_date', '>=', now());
-            })
-            ->orderBy('due_date')
-            ->take(5)
+            // Not completed and has due date
+            ->where('status', '!=', 'completed')
+            ->whereNotNull('due_date')
+            // Due date is in the future or today
+            ->whereDate('due_date', '>=', now())
+            ->orderBy('due_date', 'asc')
+            ->limit(5)
             ->get()
-            ->map(function($task) {
-                return [
+            ->map(fn($task): array =>  [
                     'id' => $task->id,
                     'name' => $task->name,
                     'description' => $task->description,
+                    'status' => $task->status,
                     'due_date' => $task->due_date,
                     'project_id' => $task->project_id,
                     'comments_count' => $task->comments->count()
-                ];
-            });
+                ]
+            );
         
         return response()->json($tasks);
-    }
-    
-    public function announcements()
-    {
-        // In a real app, you'd fetch from a database
-        // Here we'll return mock data
-        $announcements = [
-            [
-                'id' => 1,
-                'title' => 'Welcome to Project Management',
-                'content' => 'This is your new project management system. Explore the features!',
-                'created_at' => now()->subDays(2)
-            ]
-        ];
-        
-        return response()->json($announcements);
     }
 }
