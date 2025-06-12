@@ -21,7 +21,7 @@ class Task extends Model
 
     public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "user_id");
     }
 
     public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany

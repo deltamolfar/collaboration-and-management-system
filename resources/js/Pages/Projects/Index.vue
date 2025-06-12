@@ -233,112 +233,109 @@ const toggleViewMode = () => {
         </div>
         
         <!-- Filters Card -->
-        <div class="mb-6 overflow-hidden bg-white shadow-sm rounded-xl dark:bg-gray-800">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex flex-col space-y-4">
-              <!-- Top row filters -->
-              <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-                <!-- Search -->
-                <div class="flex-grow md:max-w-xs">
-                  <label for="search" class="sr-only">Search projects</label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      id="search"
-                      v-model="search"
-                      placeholder="Search projects"
-                      class="block w-full py-2 pl-10 pr-3 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 sm:text-sm"
-                    />
-                  </div>
+        <div class="flex flex-col p-6 mb-4 space-y-4 overflow-hidden bg-white border-b border-gray-200 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700">
+          <!-- Top row filters -->
+          <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
+            <!-- Status filter -->
+            <div class="w-full md:w-auto">
+              <label for="status" class="sr-only">Status</label>
+              <select
+                id="status"
+                v-model="selectedStatus"
+                class="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+              >
+                <option v-for="option in statusOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Search -->
+            <div class="flex-grow">
+              <label for="search" class="sr-only">Search projects</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
                 </div>
-
-                <!-- Status filter -->
-                <div class="w-full md:w-auto">
-                  <label for="status" class="sr-only">Status</label>
-                  <select
-                    id="status"
-                    v-model="selectedStatus"
-                    class="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  >
-                    <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-                      {{ option.label }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Owner filter -->
-                <div class="w-full md:w-auto">
-                  <label for="owner" class="sr-only">Owner</label>
-                  <select
-                    id="owner"
-                    v-model="selectedOwner"
-                    class="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  >
-                    <option value="">All Owners</option>
-                    <option v-for="userOption in props.users" :key="userOption.id" :value="userOption.id">
-                      {{ userOption.name }}
-                    </option>
-                  </select>
-                </div>
+                <input
+                  type="text"
+                  id="search"
+                  v-model="search"
+                  placeholder="Search projects"
+                  class="block w-full py-2 pl-10 pr-3 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 sm:text-sm"
+                />
               </div>
-              
-              <!-- Bottom row filters -->
-              <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-                <!-- Date from filter -->
-                <div class="w-full md:w-auto">
-                  <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From Date</label>
-                  <input
-                    type="date"
-                    id="date_from"
-                    v-model="dateFrom"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  />
-                </div>
-                
-                <!-- Date to filter -->
-                <div class="w-full md:w-auto">
-                  <label for="date_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To Date</label>
-                  <input
-                    type="date"
-                    id="date_to"
-                    v-model="dateTo"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  />
-                </div>
-                
-                <!-- Quick date filters -->
-                <div class="flex flex-wrap gap-2 mt-5 md:mt-0">
-                  <button
-                    @click="setDateRangeLastWeek"
-                    class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-                  >
-                    Last 7 days
-                  </button>
-                  <button
-                    @click="setDateRangeLastMonth"
-                    class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-                  >
-                    Last 30 days
-                  </button>
-                  <button
-                    @click="showMyProjects"
-                    class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-                  >
-                    My Projects
-                  </button>
-                  <button
-                    @click="clearFilters"
-                    class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              </div>
+            </div>
+
+
+            <!-- Owner filter -->
+            <div class="w-full md:w-auto">
+              <label for="owner" class="sr-only">Owner</label>
+              <select
+                id="owner"
+                v-model="selectedOwner"
+                class="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+              >
+                <option value="">All Owners</option>
+                <option v-for="userOption in props.users" :key="userOption.id" :value="userOption.id">
+                  {{ userOption.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Bottom row filters -->
+          <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
+            <!-- Date from filter -->
+            <div class="w-full md:w-auto">
+              <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From Date</label>
+              <input
+                type="date"
+                id="date_from"
+                v-model="dateFrom"
+                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+              />
+            </div>
+            
+            <!-- Date to filter -->
+            <div class="w-full md:w-auto">
+              <label for="date_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To Date</label>
+              <input
+                type="date"
+                id="date_to"
+                v-model="dateTo"
+                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+              />
+            </div>
+            
+            <!-- Quick date filters -->
+            <div class="flex flex-wrap w-full gap-2 md:w-auto">
+              <button
+                @click="setDateRangeLastWeek"
+                class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                Last 7 days
+              </button>
+              <button
+                @click="setDateRangeLastMonth"
+                class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                Last 30 days
+              </button>
+              <button
+                @click="showMyProjects"
+                class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                My Projects
+              </button>
+              <button
+                @click="clearFilters"
+                class="px-3 py-2 text-xs text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                Clear Filters
+              </button>
             </div>
           </div>
         </div>
@@ -468,7 +465,7 @@ const toggleViewMode = () => {
               <div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center">
                   <span class="text-xs text-gray-500 dark:text-gray-400">Owner: </span>
-                  <span class="ml-1 text-sm font-medium text-gray-900 dark:text-white">{{ project.user?.name || 'Unknown' }}</span>
+                  <span class="ml-1 text-sm font-medium text-gray-900 dark:text-white">{{ project.owner?.name || 'Unknown' }}</span>
                 </div>
                 <Link :href="route('projects.show', project.id)" class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                   View Project

@@ -149,92 +149,85 @@ onMounted(() => {
     </template>
 
     <!-- Main Content -->
-    <div class="py-6">
-      <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-          <div class="p-6 bg-white border-b border-gray-200">
-            
-            <!-- Loading State -->
-            <div v-if="loading" class="flex items-center justify-center h-32">
-              <svg class="w-8 h-8 text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
+    <div class="mt-2 overflow-hidden">
+        <!-- Loading State -->
+        <div v-if="loading" class="flex items-center justify-center h-32">
+          <svg class="w-8 h-8 text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
 
-            <!-- No Webhooks State -->
-            <div v-else-if="webhooks.length === 0" class="flex flex-col items-center justify-center py-12">
-              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        <!-- No Webhooks State -->
+        <div v-else-if="webhooks.length === 0" class="flex flex-col items-center justify-center py-12">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No webhooks found</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by creating a new webhook.</p>
+          <div class="mt-6">
+            <button
+              @click="openCreateModal"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <svg class="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900">No webhooks found</h3>
-              <p class="mt-1 text-sm text-gray-500">Get started by creating a new webhook.</p>
-              <div class="mt-6">
-                <button
-                  @click="openCreateModal"
-                  class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  <svg class="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  New Webhook
-                </button>
-              </div>
-            </div>
-
-            <!-- Webhooks Table -->
-            <div v-else class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Event</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">URL</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Headers</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Created</th>
-                    <th scope="col" class="relative px-6 py-3">
-                      <span class="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="webhook in webhooks" :key="webhook.id">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ getActionLabel(webhook.action) }}
-                      </div>
-                      <div class="text-sm text-gray-500">
-                        {{ webhook.action }}
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="text-sm text-gray-900 line-clamp-1">{{ webhook.url }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span v-if="webhook.header_key" class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                        {{ webhook.header_key }}: {{ webhook.header_value }}
-                      </span>
-                      <span v-else class="text-sm text-gray-500">No headers</span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                      {{ new Date(webhook.created_at).toLocaleDateString() }}
-                    </td>
-                    <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                      <div class="flex items-center justify-end space-x-3">
-                        <button @click="openEditModal(webhook)" class="text-indigo-600 hover:text-indigo-900">
-                          Edit
-                        </button>
-                        <button @click="openDeleteConfirm(webhook.id)" class="text-red-600 hover:text-red-900">
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              New Webhook
+            </button>
           </div>
         </div>
-      </div>
+
+        <!-- Webhooks Table -->
+        <div v-else class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Event</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">URL</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Headers</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Created</th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="webhook in webhooks" :key="webhook.id">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ getActionLabel(webhook.action) }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ webhook.action }}
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900 line-clamp-1">{{ webhook.url }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span v-if="webhook.header_key" class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                    {{ webhook.header_key }}: {{ webhook.header_value }}
+                  </span>
+                  <span v-else class="text-sm text-gray-500">No headers</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                  {{ new Date(webhook.created_at).toLocaleDateString() }}
+                </td>
+                <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end space-x-3">
+                    <button @click="openEditModal(webhook)" class="text-indigo-600 hover:text-indigo-900">
+                      Edit
+                    </button>
+                    <button @click="openDeleteConfirm(webhook.id)" class="text-red-600 hover:text-red-900">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
     </div>
 
     <!-- Create/Edit Modal -->

@@ -17,7 +17,7 @@ class Project extends Model
 
     public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "user_id");
     }
 
     // public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

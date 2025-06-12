@@ -36,10 +36,13 @@ const statusOptions = [
   { value: 'closed', label: 'Closed' }
 ];
 
+const completed_tasks_count = computed(() => {
+  return props.project.tasks ? props.project.tasks.filter(task => task.status === 'completed').length : 0;
+});
+
 // Calculate project progress
 const progress = computed(() => {
-  if (!props.project.tasks_count || props.project.tasks_count === 0) return 0;
-  return Math.round((props.project.completed_tasks_count / props.project.tasks_count) * 100);
+  return Math.round((completed_tasks_count.value / props.project.tasks.length) * 100);
 });
 
 // Format date helper
@@ -149,7 +152,7 @@ const toggleSort = (column) => {
             {{ project.status.replace('_', ' ').charAt(0).toUpperCase() + project.status.slice(1).replace('_', ' ') }}
           </span>
         </div>
-        
+
         <div class="flex space-x-2">
           <Link 
             v-if="canUpdateProject" 
@@ -205,8 +208,8 @@ const toggleSort = (column) => {
                     <div class="h-2 bg-indigo-600 rounded-full dark:bg-indigo-500" :style="{ width: `${progress}%` }"></div>
                   </div>
                   <div class="flex items-center justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    <span>{{ project.completed_tasks_count || 0 }} completed</span>
-                    <span>{{ project.tasks_count || 0 }} total tasks</span>
+                    <span>{{ completed_tasks_count || 0 }} completed</span>
+                    <span>{{ project?.tasks?.length || 0 }} total tasks</span>
                   </div>
                 </div>
               </div>

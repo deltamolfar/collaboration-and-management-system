@@ -93,7 +93,7 @@ const getStatusBadgeClass = (status) => {
     client_test: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
     completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   };
-  return `${classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'} px-2 py-1 text-xs font-medium rounded-full`;
+  return `${classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'} px-8 py-1 font-medium rounded-lg`;
 };
 
 const statusLabel = computed(() => {
@@ -249,288 +249,286 @@ const updateTask = async () => {
       </div>
     </template>
 
-    <div class="py-12">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <!-- Task Header Card -->
-        <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <!-- Task Title (click to edit) -->
-              <div class="flex-grow">
-                <div v-if="editing.name && canEdit" class="flex items-center">
-                  <input
-                    id="edit-name"
-                    v-model="form.name"
-                    type="text"
-                    class="block w-full text-2xl font-bold border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    @blur="saveField('name')"
-                    @keyup.enter="saveField('name')"
-                  />
-                </div>
-                <h1 
-                  v-else 
-                  @click="startEditing('name')" 
-                  class="text-2xl font-bold text-gray-900 dark:text-gray-100"
-                  :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
-                >
-                  {{ form.name }}
-                  <span v-if="canEdit" class="ml-2 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
-                </h1>
+    <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <!-- Task Header Card -->
+      <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <!-- Task Title (click to edit) -->
+            <div class="flex-grow">
+              <div v-if="editing.name && canEdit" class="flex items-center">
+                <input
+                  id="edit-name"
+                  v-model="form.name"
+                  type="text"
+                  class="block w-full text-2xl font-bold border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  @blur="saveField('name')"
+                  @keyup.enter="saveField('name')"
+                />
               </div>
-
-              <!-- Status Badge -->
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Status:</span>
-                <div v-if="editing.status && canEdit" class="min-w-[120px]">
-                  <select
-                    id="edit-status"
-                    v-model="form.status"
-                    class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    @blur="saveField('status')"
-                    @change="saveField('status')"
-                  >
-                    <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-                      {{ option.label }}
-                    </option>
-                  </select>
-                </div>
-                <span 
-                  v-else 
-                  @click="startEditing('status')" 
-                  :class="[getStatusBadgeClass(form.status), canEdit ? 'cursor-pointer' : '']"
-                >
-                  {{ statusLabel }}
-                </span>
-              </div>
-
-              <!-- Delete Task Button -->
-              <button
-                v-if="canDelete"
-                @click="deleteTask"
-                class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition bg-red-600 border border-transparent rounded-md hover:bg-red-700 active:bg-red-900 focus:outline-none focus:border-red-900 focus:ring focus:ring-red-300 disabled:opacity-25 dark:hover:bg-red-700 dark:focus:ring-red-900"
+              <h1 
+                v-else 
+                @click="startEditing('name')" 
+                class="text-2xl font-bold text-gray-900 dark:text-gray-100"
+                :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Delete Task
-              </button>
+                {{ form.name }}
+                <span v-if="canEdit" class="ml-2 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
+              </h1>
             </div>
+
+            <!-- Status Badge -->
+            <div class="flex items-center gap-2">
+              <span class="text-gray-600 text-md dark:text-gray-400">Status:</span>
+              <div v-if="editing.status && canEdit" class="min-w-[120px]">
+                <select
+                  id="edit-status"
+                  v-model="form.status"
+                  class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  @blur="saveField('status')"
+                  @change="saveField('status')"
+                >
+                  <option v-for="option in statusOptions" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+              <span 
+                v-else 
+                @click="startEditing('status')" 
+                :class="[getStatusBadgeClass(form.status), canEdit ? 'cursor-pointer' : '']"
+              >
+                {{ statusLabel }}
+              </span>
+            </div>
+
+            <!-- Delete Task Button -->
+            <button
+              v-if="canDelete"
+              @click="deleteTask"
+              class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition bg-red-600 border border-transparent rounded-md hover:bg-red-700 active:bg-red-900 focus:outline-none focus:border-red-900 focus:ring focus:ring-red-300 disabled:opacity-25 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Task
+            </button>
           </div>
         </div>
-        
-        <!-- Task Details Card -->
-        <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <!-- Description -->
-              <div class="md:col-span-2">
-                <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">Description</h3>
-                <div v-if="editing.description && canEdit" class="mt-1">
-                  <textarea
-                    id="edit-description"
-                    v-model="form.description"
-                    rows="6"
+      </div>
+      
+      <!-- Task Details Card -->
+      <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <!-- Description -->
+            <div class="md:col-span-2">
+              <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">Description</h3>
+              <div v-if="editing.description && canEdit" class="mt-1">
+                <textarea
+                  id="edit-description"
+                  v-model="form.description"
+                  rows="6"
+                  class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  @blur="saveField('description')"
+                ></textarea>
+              </div>
+              <div 
+                v-else 
+                @click="startEditing('description')" 
+                class="p-3 mt-1 prose-sm prose rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-300 max-w-none"
+                :class="{'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600': canEdit}"
+              >
+                <p v-if="form.description">{{ form.description }}</p>
+                <p v-else class="italic text-gray-500 dark:text-gray-400">No description provided</p>
+                <div v-if="canEdit" class="mt-2 text-xs text-gray-400 dark:text-gray-500">(click to edit)</div>
+              </div>
+            </div>
+
+            <!-- Task Properties -->
+            <div class="space-y-4">
+              <!-- Due Date -->
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</h4>
+                <div v-if="editing.due_date && canEdit" class="mt-1">
+                  <input
+                    id="edit-due_date"
+                    v-model="form.due_date"
+                    type="date"
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    @blur="saveField('description')"
-                  ></textarea>
+                    @blur="saveField('due_date')"
+                  />
                 </div>
                 <div 
                   v-else 
-                  @click="startEditing('description')" 
-                  class="p-3 mt-1 prose-sm prose rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-300 max-w-none"
-                  :class="{'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600': canEdit}"
+                  @click="startEditing('due_date')" 
+                  class="mt-1 text-gray-900 dark:text-gray-100"
+                  :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
                 >
-                  <p v-if="form.description">{{ form.description }}</p>
-                  <p v-else class="italic text-gray-500 dark:text-gray-400">No description provided</p>
-                  <div v-if="canEdit" class="mt-2 text-xs text-gray-400 dark:text-gray-500">(click to edit)</div>
+                  {{ formatDate(form.due_date) }}
+                  <span v-if="canEdit" class="ml-1 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
                 </div>
               </div>
 
-              <!-- Task Properties -->
-              <div class="space-y-4">
-                <!-- Due Date -->
-                <div>
-                  <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</h4>
-                  <div v-if="editing.due_date && canEdit" class="mt-1">
-                    <input
-                      id="edit-due_date"
-                      v-model="form.due_date"
-                      type="date"
-                      class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      @blur="saveField('due_date')"
-                    />
-                  </div>
-                  <div 
-                    v-else 
-                    @click="startEditing('due_date')" 
-                    class="mt-1 text-gray-900 dark:text-gray-100"
-                    :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
+              <!-- Assignees -->
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned to</h4>
+                <div v-if="editing.assignees && canEdit" class="mt-1">
+                  <select
+                    id="edit-assignees"
+                    v-model="form.assignees"
+                    class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    @blur="saveField('assignees')"
+                    @change="saveField('assignees')"
                   >
-                    {{ formatDate(form.due_date) }}
-                    <span v-if="canEdit" class="ml-1 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
-                  </div>
+                    <option v-for="user in users" :key="user.id" :value="[user.id]">
+                      {{ user.name }}
+                    </option>
+                  </select>
                 </div>
-
-                <!-- Assignees -->
-                <div>
-                  <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned to</h4>
-                  <div v-if="editing.assignees && canEdit" class="mt-1">
-                    <select
-                      id="edit-assignees"
-                      v-model="form.assignees"
-                      class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      @blur="saveField('assignees')"
-                      @change="saveField('assignees')"
+                <div 
+                  v-else 
+                  @click="startEditing('assignees')" 
+                  class="mt-1 text-gray-900 dark:text-gray-100"
+                  :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
+                >
+                  <div class="flex flex-wrap gap-1">
+                    <span 
+                      v-for="taskUser in props.task.users" 
+                      :key="taskUser.id"
+                      class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300"
                     >
-                      <option v-for="user in users" :key="user.id" :value="[user.id]">
-                        {{ user.name }}
-                      </option>
-                    </select>
-                  </div>
-                  <div 
-                    v-else 
-                    @click="startEditing('assignees')" 
-                    class="mt-1 text-gray-900 dark:text-gray-100"
-                    :class="{'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400': canEdit}"
-                  >
-                    <div class="flex flex-wrap gap-1">
-                      <span 
-                        v-for="taskUser in props.task.users" 
-                        :key="taskUser.id"
-                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300"
-                      >
-                        {{ taskUser.name }}
-                      </span>
-                    </div>
-                    <span v-if="canEdit" class="block mt-1 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
-                  </div>
-                </div>
-                
-                <!-- Project -->
-                <div>
-                  <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Project</h4>
-                  <div class="mt-1 text-gray-900 dark:text-gray-100">
-                    <Link :href="route('projects.show', props.project.id)" class="text-blue-600 hover:underline dark:text-blue-400">
-                      {{ props.project.name }}
-                    </Link>
-                  </div>
-                </div>
-                
-                <!-- Created At -->
-                <div>
-                  <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h4>
-                  <div class="mt-1 text-gray-900 dark:text-gray-100">
-                    {{ formatDate(props.task.created_at) }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Time Logs Card -->
-        <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Time Logs</h3>
-              <button 
-                v-if="canLogTime" 
-                @click="dialog = true" 
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Add Time Log
-              </button>
-            </div>
-            <div v-if="logs.length === 0" class="px-4 py-8 text-center text-gray-500 rounded-md dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
-              No time logs recorded for this task yet.
-            </div>
-            <div v-else class="overflow-hidden bg-white border border-gray-200 dark:bg-gray-700 dark:border-gray-600 sm:rounded-lg">
-              <ul class="divide-y divide-gray-200 dark:divide-gray-600">
-                <li v-for="log in logs" :key="log.id" class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-650">
-                  <div class="flex justify-between">
-                    <div>
-                      <div class="flex items-center gap-2">
-                        <span class="font-medium text-gray-900 dark:text-gray-100">{{ log.user.name }}</span>
-                        <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                          {{ log.time_spent }} hours
-                        </span>
-                      </div>
-                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ new Date(log.time_start).toLocaleString() }} - {{ new Date(log.time_end).toLocaleString() }}
-                      </p>
-                      <p v-if="log.description" class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                        {{ log.description }}
-                      </p>
-                    </div>
-                    <button 
-                      v-if="log.user.id === user.id || user.role.abilities.includes('task.log_delete')" 
-                      @click="deleteLog(log.id)" 
-                      class="p-1 text-gray-400 rounded-full hover:bg-gray-200 hover:text-gray-500 dark:hover:bg-gray-600 dark:hover:text-gray-300"
-                      title="Delete log"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Comments Card -->
-        <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Comments</h3>
-            
-            <div v-if="comments.length === 0" class="px-4 py-8 text-center text-gray-500 rounded-md dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
-              No comments yet. Be the first to comment on this task!
-            </div>
-            <ul v-else class="space-y-4">
-              <li v-for="comment in comments" :key="comment.id" class="border-b border-gray-200 dark:border-gray-700">
-                <div class="flex justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ comment.user.name }}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ new Date(comment.created_at).toLocaleString() }}
+                      {{ taskUser.name }}
                     </span>
                   </div>
+                  <span v-if="canEdit" class="block mt-1 text-xs text-gray-400 dark:text-gray-500">(click to edit)</span>
+                </div>
+              </div>
+              
+              <!-- Project -->
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Project</h4>
+                <div class="mt-1 text-gray-900 dark:text-gray-100">
+                  <Link :href="route('projects.show', props.project.id)" class="text-blue-600 hover:underline dark:text-blue-400">
+                    {{ props.project.name }}
+                  </Link>
+                </div>
+              </div>
+              
+              <!-- Created At -->
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h4>
+                <div class="mt-1 text-gray-900 dark:text-gray-100">
+                  {{ formatDate(props.task.created_at) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Logs Card -->
+      <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Time Logs</h3>
+            <button 
+              v-if="canLogTime" 
+              @click="dialog = true" 
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Add Time Log
+            </button>
+          </div>
+          <div v-if="logs.length === 0" class="px-4 py-8 text-center text-gray-500 rounded-md dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+            No time logs recorded for this task yet.
+          </div>
+          <div v-else class="overflow-hidden bg-white border border-gray-200 dark:bg-gray-700 dark:border-gray-600 sm:rounded-lg">
+            <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+              <li v-for="log in logs" :key="log.id" class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-650">
+                <div class="flex justify-between">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-medium text-gray-900 dark:text-gray-100">{{ log.user.name }}</span>
+                      <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                        {{ log.time_spent }} hours
+                      </span>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {{ new Date(log.time_start).toLocaleString() }} - {{ new Date(log.time_end).toLocaleString() }}
+                    </p>
+                    <p v-if="log.description" class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                      {{ log.description }}
+                    </p>
+                  </div>
                   <button 
-                    v-if="comment.user.id === user.id || user.role.abilities.includes('task.comment_delete')" 
-                    @click="deleteComment(comment.id)" 
-                    class="text-gray-400 rounded-full hover:bg-gray-200 hover:text-gray-500 dark:hover:bg-gray-600 dark:hover:text-gray-300"
-                    title="Delete comment"
+                    v-if="log.user.id === user.id || user.role.abilities.includes('task.log_delete')" 
+                    @click="deleteLog(log.id)" 
+                    class="p-1 text-gray-400 rounded-full hover:bg-gray-200 hover:text-gray-500 dark:hover:bg-gray-600 dark:hover:text-gray-300"
+                    title="Delete log"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>
-                <p class="mt-2 text-gray-700 dark:text-gray-300">{{ comment.comment }}</p>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
 
-            <div v-if="canComment" class="mt-6">
-              <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Add a comment</h4>
-              <textarea 
-                v-model="newComment" 
-                placeholder="Write your comment here..." 
-                rows="3" 
-                class="block w-full border-gray-300 rounded-md shadow-sm resize-y focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-              ></textarea>
-              <div v-if="errors.comment" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.comment }}</div>
-              <button 
-                @click="submitComment" 
-                class="inline-flex items-center px-4 py-2 mt-3 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed dark:focus:ring-offset-gray-800"
-                :disabled="!newComment.trim()"
-              >
-                Post Comment
-              </button>
-            </div>
+      <!-- Comments Card -->
+      <div class="mt-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Comments</h3>
+          
+          <div v-if="comments.length === 0" class="px-4 py-8 text-center text-gray-500 rounded-md dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+            No comments yet. Be the first to comment on this task!
+          </div>
+          <ul v-else class="space-y-4">
+            <li v-for="comment in comments" :key="comment.id" class="border-b border-gray-200 dark:border-gray-700">
+              <div class="flex justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ comment.user.name }}</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ new Date(comment.created_at).toLocaleString() }}
+                  </span>
+                </div>
+                <button 
+                  v-if="comment.user.id === user.id || user.role.abilities.includes('task.comment_delete')" 
+                  @click="deleteComment(comment.id)" 
+                  class="text-gray-400 rounded-full hover:bg-gray-200 hover:text-gray-500 dark:hover:bg-gray-600 dark:hover:text-gray-300"
+                  title="Delete comment"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+              <p class="mt-2 text-gray-700 dark:text-gray-300">{{ comment.comment }}</p>
+            </li>
+          </ul>
+
+          <div v-if="canComment" class="mt-6">
+            <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Add a comment</h4>
+            <textarea 
+              v-model="newComment" 
+              placeholder="Write your comment here..." 
+              rows="3" 
+              class="block w-full border-gray-300 rounded-md shadow-sm resize-y focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+            ></textarea>
+            <div v-if="errors.comment" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.comment }}</div>
+            <button 
+              @click="submitComment" 
+              class="inline-flex items-center px-4 py-2 mt-3 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed dark:focus:ring-offset-gray-800"
+              :disabled="!newComment.trim()"
+            >
+              Post Comment
+            </button>
           </div>
         </div>
       </div>

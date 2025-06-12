@@ -15,12 +15,12 @@ class ProjectController extends Controller
         $user = $request->user();
         $hasViewAllPermission = $user->hasAbility('project.view_all');
         
-        // Base query - Change 'user' to 'owner'
-        $query = Project::query()
-            ->with('owner')
+        $query = Project::with('owner')
             ->withCount(['tasks', 'tasks as completed_tasks_count' => function($query) {
                 $query->where('status', 'completed');
             }]);
+
+        //dd($query->toSql(), $query->getBindings());
             
         // Apply access restrictions unless user has view_all permission
         if (!$hasViewAllPermission) {
