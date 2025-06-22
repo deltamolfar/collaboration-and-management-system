@@ -419,7 +419,7 @@ onMounted(() => {
               <ul v-else class="space-y-2 overflow-y-auto max-h-96">
                 <li v-for="log in logs" :key="log.id" class="p-2 border rounded">
                   <div class="text-xs text-gray-500">{{ new Date(log.created_at).toLocaleString() }}</div>
-                  <div class="text-xs">Status: <span :class="log.status === 200 ? 'text-green-600' : 'text-red-600'">{{ log.status ?? 'Error' }}</span></div>
+                  <div class="text-xs">Status: <span :class="log.status_code === 200 ? 'text-green-600' : 'text-red-600'">{{ log.status_code ?? 'Undefined Code' }}</span></div>
                   <div class="text-xs break-all">Payload: {{ log.payload }}</div>
                   <div class="text-xs break-all">Response: {{ log.response }}</div>
                 </li>

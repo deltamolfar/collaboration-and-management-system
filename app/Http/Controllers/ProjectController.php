@@ -19,9 +19,7 @@ class ProjectController extends Controller
             ->withCount(['tasks', 'tasks as completed_tasks_count' => function($query) {
                 $query->where('status', 'completed');
             }]);
-
-        //dd($query->toSql(), $query->getBindings());
-            
+ 
         // Apply access restrictions unless user has view_all permission
         if (!$hasViewAllPermission) {
             $query->where('user_id', $user->id);
@@ -36,21 +34,17 @@ class ProjectController extends Controller
             });
         }
         
-        if ($request->filled('status')) {
+        if ($request->filled('status'))
             $query->where('status', $request->input('status'));
-        }
         
-        if ($request->filled('owner_id')) {
+        if ($request->filled('owner_id'))
             $query->where('user_id', $request->input('owner_id'));
-        }
         
-        if ($request->filled('date_from')) {
+        if ($request->filled('date_from'))
             $query->whereDate('created_at', '>=', $request->input('date_from'));
-        }
         
-        if ($request->filled('date_to')) {
+        if ($request->filled('date_to'))
             $query->whereDate('created_at', '<=', $request->input('date_to'));
-        }
         
         // Apply sorting
         $sortBy = $request->input('sort_by', 'created_at');
@@ -58,7 +52,6 @@ class ProjectController extends Controller
         
         // Handle special sort cases
         if ($sortBy === 'tasks_count') {
-            // We need to use orderByRaw for relationships count sorting
             $query->orderByRaw("(SELECT COUNT(*) FROM tasks WHERE tasks.project_id = projects.id) {$sortOrder}");
         } else {
             $query->orderBy($sortBy, $sortOrder);
@@ -103,8 +96,8 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'statuses' => 'nullable|array',
+            'name' => 'required|string|max:255|unique:projects,name',
+            'description' => 'nullable|string',
             'status' => 'required|string',
             'user_id' => 'required|exists:users,id',
         ]);
@@ -155,11 +148,10 @@ class ProjectController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => "required|string|max:255|unique:projects,name,$project->id",
             'description' => 'nullable|string',
             'status' => 'required|string',
-            'owner_id' => 'required|exists:users,id',
-            'statuses' => 'sometimes|array',
+            'user_id' => 'required|exists:users,id',
         ]);
 
         // Only admin/managers can change owner

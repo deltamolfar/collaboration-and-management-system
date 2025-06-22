@@ -128,16 +128,6 @@ const submit = () => {
                 </select>
                 <div v-if="form.errors.user_id" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.user_id }}</div>
               </div>
-
-              <!-- Divider -->
-              <div class="relative py-3">
-                <div class="absolute inset-0 flex items-center">
-                  <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="relative flex justify-center">
-                  <span class="px-3 text-sm text-gray-500 bg-white dark:text-gray-400 dark:bg-gray-800">Project Creation</span>
-                </div>
-              </div>
               
               <!-- Action Buttons -->
               <div class="flex justify-end space-x-3">

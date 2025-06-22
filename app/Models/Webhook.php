@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Error;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ class Webhook extends Model
         $webhooks = Webhook::where('action', $action)->get();
 
         foreach ($webhooks as $webhook) {
-            if (!$webhook->enabled) continue;
+            if (!$webhook->active) continue;
 
             $headers = [];
             if (is_array($webhook->headers)) {
@@ -52,18 +53,28 @@ class Webhook extends Model
                     'headers' => $headers,
                     'json' => $data,
                 ]);
-                WebhookLog::create([
+
+                Log::info("Webhook executed successfully for action: {$action}", [
+                    'action' => $action,
                     'webhook_id' => $webhook->id,
                     'payload' => json_encode($data),
                     'response' => $res->getBody()->getContents(),
-                    'status' => $res->getStatusCode(),
+                    'status_code' => $res->getStatusCode(),
+                ]);
+
+                WebhookLog::create([
+                    'action' => $action,
+                    'webhook_id' => $webhook->id,
+                    'payload' => json_encode($data),
+                    'response' => $res->getBody()->getContents(),
+                    'status_code' => $res->getStatusCode(),
                 ]);
             } catch (\Exception $e) {
-                WebhookLog::create([
+                Log::error("Webhook execution failed for action: {$action}", [
+                    'action' => $action,
                     'webhook_id' => $webhook->id,
                     'payload' => json_encode($data),
                     'response' => $e->getMessage(),
-                    'status' => null,
                 ]);
             }
         }
