@@ -11,6 +11,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskLogController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\WebhookLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -81,6 +82,9 @@ Route::middleware('auth')->group(function () {
                 Route::post('/webhooks', [WebhookController::class, 'store'])->name('admin.webhooks.store');
                 Route::put('/webhooks/{webhook}', [WebhookController::class, 'update'])->name('admin.webhooks.update');
                 Route::delete('/webhooks/{webhook}', [WebhookController::class, 'destroy'])->name('admin.webhooks.destroy');
+                Route::patch('/webhooks/{webhook}/toggle', [WebhookController::class, 'toggleEnabled'])->name('admin.webhooks.toggle');
+                Route::get('/webhooks/{webhook}/logs', [WebhookLogController::class, 'show'])->name('admin.webhooks.logs');
+                Route::post('/webhooks/{webhook}/test', [WebhookController::class, 'test'])->name('admin.webhooks.test');
             });
         });
 });

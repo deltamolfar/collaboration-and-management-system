@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('webhooks', function (Blueprint $table) {
+        Schema::create('webhook_logs', function (Blueprint $table) {
             $table->id();
-
+            
+            $table->foreignIdFor(\App\Models\Webhook::class)
+                ->constrained()
+                ->onDelete('cascade');
             $table->string('action');
-            $table->string('url');
-            $table->boolean('active')->default(true);
-            $table->json('headers')->nullable();
-            $table->string('hmac_secret')->nullable();
+            $table->text('payload')->nullable();
+            $table->text('response')->nullable();
+            $table->integer('status_code')->nullable();
 
             $table->timestamps();
         });
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('webhooks');
+        Schema::dropIfExists('webhook_logs');
     }
 };

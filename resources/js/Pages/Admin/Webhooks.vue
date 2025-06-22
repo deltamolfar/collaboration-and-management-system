@@ -35,9 +35,12 @@ const actionOptions = [
 const form = useForm({
   action: '',
   url: '',
-  header_key: '',
-  header_value: '',
+  headers: [{ key: '', value: '' }],
+  hmac_secret: '',
 });
+
+const addHeader = () => form.headers.push({ key: '', value: '' });
+const removeHeader = (idx) => form.headers.splice(idx, 1);
 
 // Load all webhooks
 const loadWebhooks = async () => {
@@ -64,8 +67,10 @@ const openCreateModal = () => {
 const openEditModal = (webhook) => {
   form.action = webhook.action;
   form.url = webhook.url;
-  form.header_key = webhook.header_key || '';
-  form.header_value = webhook.header_value || '';
+  form.headers = Array.isArray(webhook.headers) && webhook.headers.length > 0
+    ? webhook.headers.map(h => ({ key: h.key, value: h.value }))
+    : [{ key: '', value: '' }];
+  form.hmac_secret = webhook.hmac_secret || '';
   editingId.value = webhook.id;
   modalType.value = 'edit';
   showModal.value = true;
@@ -76,6 +81,11 @@ const openEditModal = (webhook) => {
 const openDeleteConfirm = (id) => {
   deleteId.value = id;
   confirmDelete.value = true;
+};
+
+const toggleWebhook = async (webhook) => {
+  await axios.patch(route('admin.webhooks.toggle', webhook.id));
+  loadWebhooks();
 };
 
 // Submit the form (create or update)
@@ -103,6 +113,20 @@ const submitForm = () => {
   }
 };
 
+const testModal = ref(false);
+const testResult = ref(null);
+
+const sendTestWebhook = async (webhook) => {
+  testResult.value = null;
+  testModal.value = true;
+  try {
+    const { data } = await axios.post(route('admin.webhooks.test', webhook.id));
+    testResult.value = data;
+  } catch (e) {
+    testResult.value = e.response?.data || { success: false, error: e.message };
+  }
+};
+
 // Delete a webhook
 const deleteWebhook = () => {
   if (deleteId.value) {
@@ -121,6 +145,18 @@ const deleteWebhook = () => {
 const getActionLabel = (actionValue) => {
   const option = actionOptions.find(o => o.value === actionValue);
   return option ? option.label : actionValue;
+};
+
+const showLogsModal = ref(false);
+const logs = ref([]);
+const logsLoading = ref(false);
+
+const openLogsModal = async (id) => {
+  showLogsModal.value = true;
+  logsLoading.value = true;
+  const { data } = await axios.get(route('admin.webhooks.logs', id));
+  logs.value = data;
+  logsLoading.value = false;
 };
 
 // Load webhooks on component mount
@@ -201,15 +237,12 @@ onMounted(() => {
                   <div class="text-sm text-gray-500">
                     {{ webhook.action }}
                   </div>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="checkbox" :checked="webhook.enabled" @change="toggleWebhook(webhook)" />
+                  </td>
                 </td>
                 <td class="px-6 py-4">
                   <div class="text-sm text-gray-900 line-clamp-1">{{ webhook.url }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span v-if="webhook.header_key" class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                    {{ webhook.header_key }}: {{ webhook.header_value }}
-                  </span>
-                  <span v-else class="text-sm text-gray-500">No headers</span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                   {{ new Date(webhook.created_at).toLocaleDateString() }}
@@ -221,6 +254,12 @@ onMounted(() => {
                     </button>
                     <button @click="openDeleteConfirm(webhook.id)" class="text-red-600 hover:text-red-900">
                       Delete
+                    </button>
+                    <button @click="openLogsModal(webhook.id)" class="text-gray-600 hover:text-gray-900">
+                      Logs
+                    </button>
+                    <button @click="sendTestWebhook(webhook)" class="text-blue-600 hover:text-blue-900">
+                      Test
                     </button>
                   </div>
                 </td>
@@ -275,30 +314,27 @@ onMounted(() => {
                     <div v-if="errors.url" class="mt-1 text-sm text-red-600">{{ errors.url }}</div>
                   </div>
                   
-                  <!-- Header key/value -->
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label for="header_key" class="block text-sm font-medium text-gray-700">Header Key (Optional)</label>
-                      <input
-                        type="text"
-                        id="header_key"
-                        v-model="form.header_key"
-                        placeholder="X-Api-Key"
-                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                      <div v-if="errors.header_key" class="mt-1 text-sm text-red-600">{{ errors.header_key }}</div>
+                  <!-- Headers -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Headers</label>
+                    <div v-for="(header, idx) in form.headers" :key="idx" class="flex mt-1 space-x-2">
+                      <input v-model="header.key" placeholder="Header Key" class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                      <input v-model="header.value" placeholder="Header Value" class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                      <button type="button" @click="removeHeader(idx)" v-if="form.headers.length > 1" class="text-red-600">Remove</button>
                     </div>
-                    <div>
-                      <label for="header_value" class="block text-sm font-medium text-gray-700">Header Value</label>
-                      <input
-                        type="text"
-                        id="header_value"
-                        v-model="form.header_value"
-                        placeholder="your-api-key"
-                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                      <div v-if="errors.header_value" class="mt-1 text-sm text-red-600">{{ errors.header_value }}</div>
-                    </div>
+                    <button type="button" @click="addHeader" class="mt-2 text-blue-600">Add Header</button>
+                  </div>
+
+                  <!-- HMAC Secret -->
+                  <div>
+                    <label for="hmac_secret" class="block text-sm font-medium text-gray-700">HMAC Secret (Optional)</label>
+                    <input
+                      type="text"
+                      id="hmac_secret"
+                      v-model="form.hmac_secret"
+                      placeholder="Secret for HMAC signature"
+                      class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
                   </div>
                 </div>
               </div>
@@ -362,6 +398,66 @@ onMounted(() => {
               class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Webhook Logs Modal -->
+    <div v-if="showLogsModal" class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+            <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">Webhook Logs</h3>
+            <div v-if="logsLoading">Loading...</div>
+            <div v-else>
+              <div v-if="logs.length === 0" class="text-gray-500">No logs found.</div>
+              <ul v-else class="space-y-2 overflow-y-auto max-h-96">
+                <li v-for="log in logs" :key="log.id" class="p-2 border rounded">
+                  <div class="text-xs text-gray-500">{{ new Date(log.created_at).toLocaleString() }}</div>
+                  <div class="text-xs">Status: <span :class="log.status === 200 ? 'text-green-600' : 'text-red-600'">{{ log.status ?? 'Error' }}</span></div>
+                  <div class="text-xs break-all">Payload: {{ log.payload }}</div>
+                  <div class="text-xs break-all">Response: {{ log.response }}</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="showLogsModal = false" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Webhook Modal -->
+    <div v-if="testModal" class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+            <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">Test Webhook Result</h3>
+            <div v-if="!testResult">Sending...</div>
+            <div v-else>
+              <div v-if="testResult.success" class="text-green-700">
+                <div>Status: {{ testResult.status }}</div>
+                <div>Response: <pre class="break-all whitespace-pre-wrap">{{ testResult.response }}</pre></div>
+              </div>
+              <div v-else class="text-red-700">
+                <div>Error: {{ testResult.error }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="testModal = false" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+              Close
             </button>
           </div>
         </div>

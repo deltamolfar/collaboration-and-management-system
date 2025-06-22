@@ -3,29 +3,69 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 class Webhook extends Model
 {
     protected $fillable = [
         'action',
         'url',
+        'active',
         'headers',
+        'hmac_secret',
     ];
 
     protected $casts = [
+        'action' => 'string',
+        'url' => 'string',
+        'active' => 'boolean',
         'headers' => 'array',
+        'hmac_secret' => 'string',
     ];
 
-    static public function execute($action, $data)
+    public function logs(): HasMany
     {
+        return $this->hasMany(WebhookLog::class);
+    }
+
+    public static function execute($action, $data)
+    {
+        Log::info("Executing webhook for action: {$action}", $data);
         $webhooks = Webhook::where('action', $action)->get();
 
         foreach ($webhooks as $webhook) {
+            if (!$webhook->enabled) continue;
+
+            $headers = [];
+            if (is_array($webhook->headers)) {
+                foreach ($webhook->headers as $header) {
+                    $headers[$header['key']] = $header['value'];
+                }
+            }
+            if ($webhook->hmac_secret) {
+                $headers['X-Hub-Signature'] = 'sha256=' . hash_hmac('sha256', json_encode($data), $webhook->hmac_secret);
+            }
             $client = new \GuzzleHttp\Client();
-            $client->post($webhook->url, [
-                'headers' => $webhook->headers,
-                'json' => $data,
-            ]);
+            try {
+                $res = $client->post($webhook->url, [
+                    'headers' => $headers,
+                    'json' => $data,
+                ]);
+                WebhookLog::create([
+                    'webhook_id' => $webhook->id,
+                    'payload' => json_encode($data),
+                    'response' => $res->getBody()->getContents(),
+                    'status' => $res->getStatusCode(),
+                ]);
+            } catch (\Exception $e) {
+                WebhookLog::create([
+                    'webhook_id' => $webhook->id,
+                    'payload' => json_encode($data),
+                    'response' => $e->getMessage(),
+                    'status' => null,
+                ]);
+            }
         }
     }
 }
