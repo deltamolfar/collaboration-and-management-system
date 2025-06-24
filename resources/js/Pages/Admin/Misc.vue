@@ -36,7 +36,7 @@ function deleteSetting(index) {
       <h1 class="mb-4 text-3xl font-bold">Miscellaneous Settings</h1>
     </template>
     <div>
-      <div v-for="(setting, index) in settings" :key="index" class="p-4 mb-4 bg-white rounded shadow">
+      <div v-for="(setting, index) in settings" :key="index" class="p-4 mb-4 bg-white rounded shadow dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-semibold">{{ setting.key }}</h2>
@@ -48,7 +48,7 @@ function deleteSetting(index) {
           </div>
         </div>
       </div>
-      <div class="p-4 mb-4 bg-white rounded shadow">
+      <div class="p-4 mb-4 bg-white rounded shadow dark:bg-gray-800">
         <h2 class="mb-2 text-xl font-semibold">Add New Setting</h2>
         <input v-model="newSetting.value.key" placeholder="Key" class="w-full p-2 mb-2 border rounded" />
         <input v-model="newSetting.value.value" placeholder="Value" class="w-full p-2 mb-2 border rounded" />
@@ -57,3 +57,13 @@ function deleteSetting(index) {
     </div>
   </AdminLayout>
 </template>
+
+<style scoped>
+input {
+  @apply text-black dark:text-white bg-white dark:bg-gray-800;
+}
+
+select {
+  @apply text-black dark:text-white bg-white dark:bg-gray-800;
+}
+</style>

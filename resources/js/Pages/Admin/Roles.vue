@@ -94,7 +94,7 @@ const dialog = ref(false);
     </template>
     <div>
       <button @click="openCreateRole" class="px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-400">Create Role</button>
-      <div v-for="(role, index) in roles" :key="index" class="p-4 mb-4 bg-white rounded shadow">
+      <div v-for="(role, index) in roles" :key="index" class="p-4 mb-4 bg-white rounded shadow dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-semibold">{{ role.name }}</h2>
@@ -109,7 +109,7 @@ const dialog = ref(false);
       </div>
     </div>
 
-    <dialog v-show="dialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <dialog v-show="dialog" class="fixed inset-0 z-50 flex items-center justify-center min-w-full min-h-full bg-black bg-opacity-50">
       <div class="w-1/2 p-6 bg-white rounded shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-2xl font-bold">{{ updatingDialog ? 'Update Role' : 'Create Role' }}</h2>

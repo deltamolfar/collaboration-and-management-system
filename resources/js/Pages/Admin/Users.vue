@@ -98,7 +98,7 @@ const dialog = ref(false);
     </template>
     <div>
       <button @click="openCreateUser" class="px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-400">Create User</button>
-      <div v-for="(user, index) in users" :key="index" class="p-4 mb-4 bg-white rounded shadow">
+      <div v-for="(user, index) in users" :key="index" class="p-4 mb-4 bg-white rounded shadow dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-semibold">{{ user.name }}</h2>
@@ -113,8 +113,8 @@ const dialog = ref(false);
       </div>
     </div>
 
-    <dialog v-show="dialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="w-1/2 p-6 bg-white rounded shadow-lg">
+    <dialog v-show="dialog" class="fixed inset-0 z-50 flex items-center justify-center min-w-full min-h-full bg-black bg-opacity-50 dark:text-white">
+      <div class="w-1/2 p-6 bg-white rounded shadow-lg dark:bg-gray-800">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-2xl font-bold">{{ updatingDialog ? 'Update User' : 'Create User' }}</h2>
           <button @click="dialog = false" class="text-xl font-bold">&times;</button>
@@ -151,3 +151,12 @@ const dialog = ref(false);
   </AdminLayout>
 </template>
 
+<style scoped>
+input {
+  @apply text-black dark:text-white bg-white dark:bg-gray-800;
+}
+
+select {
+  @apply text-black dark:text-white bg-white dark:bg-gray-800;
+}
+</style>

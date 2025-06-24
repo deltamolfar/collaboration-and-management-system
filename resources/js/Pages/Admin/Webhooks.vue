@@ -216,35 +216,29 @@ onMounted(() => {
 
         <!-- Webhooks Table -->
         <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Event</th>
                 <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">URL</th>
-                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Headers</th>
                 <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Created</th>
-                <th scope="col" class="relative px-6 py-3">
-                  <span class="sr-only">Actions</span>
-                </th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
               <tr v-for="webhook in webhooks" :key="webhook.id">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white">
                     {{ getActionLabel(webhook.action) }}
                   </div>
-                  <div class="text-sm text-gray-500">
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ webhook.action }}
                   </div>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" :checked="webhook.enabled" @change="toggleWebhook(webhook)" />
-                  </td>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900 line-clamp-1">{{ webhook.url }}</div>
+                  <div class="text-sm text-gray-900 dark:text-white line-clamp-1">{{ webhook.url }}</div>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <td class="px-6 py-4 text-sm text-gray-500 dark:text-white whitespace-nowrap">
                   {{ new Date(webhook.created_at).toLocaleDateString() }}
                 </td>
                 <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">

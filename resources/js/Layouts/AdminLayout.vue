@@ -31,7 +31,7 @@ const user = page.props.auth.user;
           </ul>
         </nav>
       </aside>
-      <main class="w-3/4 p-4 bg-gray-100">
+      <main class="w-3/4 p-4 bg-gray-100 dark:bg-gray-900 dark:text-white">
         <slot name="header" />
         <slot />
       </main>
