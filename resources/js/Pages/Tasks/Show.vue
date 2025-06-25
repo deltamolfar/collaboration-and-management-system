@@ -184,6 +184,7 @@ const deleteLog = async (logId) => {
   confirmMessage.value = 'Are you sure you want to delete this time log?';
   confirmAction.value = async () => {
     try {
+      console.log('Deleting log with ID:', logId);
       await axios.delete(route('tasks.logs.destroy', { 
         project: props.project.id, 
         task: props.task.id,
@@ -203,6 +204,7 @@ const deleteTask = () => {
   confirmMessage.value = 'Are you sure you want to delete this task? This action cannot be undone.';
   confirmAction.value = async () => {
     try {
+      console.log('Deleting task:', props.task.id);
       await axios.delete(route('tasks.destroy', { 
         project: props.project.id, 
         task: props.task.id 
@@ -636,7 +638,7 @@ const updateTask = async () => {
         </div>
         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
           <button
-            @click="confirmAction"
+            @click="confirmAction()"
             class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm dark:focus:ring-offset-gray-800"
           >
             Confirm

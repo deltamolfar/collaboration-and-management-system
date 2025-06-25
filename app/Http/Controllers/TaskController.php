@@ -126,7 +126,8 @@ class TaskController extends Controller
         ]);
     }
 
-    public function store (Request $request, Project $project) {
+    public function store (Request $request, Project $project) 
+    {
         $data = $request->validate([
             'name'          => 'required|string|max:255',
             'description'   => 'required|string|max:1024',
@@ -138,13 +139,17 @@ class TaskController extends Controller
         $data['users'] = $data['assignees'];
         $data['project_id'] = $project->id;
         $data['user_id'] = $request->user()->id;
+
         if(!$project) {
             return response()->json(['error' => 'Project not found.'], 404);
         }
-        
+
         $newTask = $project->tasks()->create($data);
         $newTask->users()->attach($data['assignees']);
         $newTask->save();
+
+        // Ensure all assigned users are also members of the project
+        $project->users()->syncWithoutDetaching($data['assignees']);
 
         return redirect()->route('tasks.show', [
             'project' => $project,
@@ -168,7 +173,8 @@ class TaskController extends Controller
         ]);
     }
 
-    public function update (Request $request, Project $project, Task $task) {
+    public function update (Request $request, Project $project, Task $task) 
+    {
         $request->validate([
             'name'          => 'required|string|max:255',
             'description'   => 'required|string|max:1024',
@@ -185,21 +191,21 @@ class TaskController extends Controller
 
         $task->update($request->all());
 
+        // Ensure all assigned users are also members of the project
+        $assignees = is_array($request->assignees) ? $request->assignees : explode(',', $request->assignees);
+        $project->users()->syncWithoutDetaching($assignees);
+
         return response("success", status: 200);
     }
 
-    public function destroy (Request $request) {
-        $project = $request->input('project');
-        $task = $request->input('task');
+    public function destroy (Request $request, Project $project, Task $task) {
         if(!$project || !$task) {
-            return Inertia::render('Errors/404',
-                ['message' => 'Project or Task not found.']
-            );
+            return response()->json(['error' => 'Project or Task not found.'], 404);
         }
 
         $task->delete();
 
-        return redirect()->route('tasks.index', ['project' => $project])->with('success', 'Task deleted successfully.');
+        return response("success", status: 200);
     }
 
 }

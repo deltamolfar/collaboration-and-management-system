@@ -28,7 +28,7 @@ class TaskLogController extends Controller
         ]);
     }
 
-    public function update(Request $request, TaskLog $log){
+    public function update(Request $request, Project $project, Task $task, TaskLog $log){
         $request->validate([
             'task_id' => 'required|exists:tasks,id',
             'user_id' => 'required|exists:users,id',
@@ -42,7 +42,7 @@ class TaskLogController extends Controller
         return $log;
     }
 
-    public function destroy(TaskLog $log){
+    public function destroy(Project $project, Task $task, TaskLog $log){
         $log->delete();
         return response()->json(['message' => 'Task log deleted successfully']);
     }

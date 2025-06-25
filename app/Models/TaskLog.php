@@ -12,7 +12,7 @@ class TaskLog extends Model
     protected $fillable = [
         'task_id',
         'user_id',
-        'comment',
+        'description',
         'time_start',
         'time_end',
         'time_spent',

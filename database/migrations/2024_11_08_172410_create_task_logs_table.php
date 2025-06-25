@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\Task::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\User::class)->constrained()->nullOnDelete();
-            $table->string('comment')->nullable();
+            $table->string('description')->nullable();
             $table->timestamp('time_start')->nullable();
             $table->timestamp('time_end')->nullable();
             $table->integer('time_spent');
