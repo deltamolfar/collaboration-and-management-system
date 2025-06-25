@@ -36,7 +36,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id' => 'required|string|number',
+            'id' => 'required|integer',
             'password' => 'nullable|string',
             'role_id' => 'nullable|string',
         ]);
