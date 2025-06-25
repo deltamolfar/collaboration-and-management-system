@@ -244,7 +244,7 @@ onMounted(async () => {
           </div>
 
           <!-- Recent Activity & Announcements -->
-          <div class="col-span-2 p-6 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+          <div class="col-span-2 p-6 overflow-hidden bg-white shadow-sm lg:col-span-1 dark:bg-gray-800 sm:rounded-lg">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Recent Activity</h3>
             <div v-if="loading" class="flex items-center justify-center h-20 mt-4">
               <svg class="w-6 h-6 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
