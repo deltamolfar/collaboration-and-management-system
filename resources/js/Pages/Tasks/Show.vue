@@ -114,6 +114,7 @@ const startEditing = (field) => {
 
 // Save changes when done editing
 const saveField = async (field) => {
+  console.log(`Saving field: ${field}`, form.value[field]);
   if (editing.value[field]) {
     editing.value[field] = false;
     await updateTask();
@@ -448,7 +449,7 @@ const updateTask = async () => {
           </div>
           <div v-else class="overflow-hidden bg-white border border-gray-200 dark:bg-gray-700 dark:border-gray-600 sm:rounded-lg">
             <ul class="divide-y divide-gray-200 dark:divide-gray-600">
-              <li v-for="log in logs" :key="log.id" class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-650">
+              <li v-for="log in logs" :key="log.id" class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-600">
                 <div class="flex justify-between">
                   <div>
                     <div class="flex items-center gap-2">

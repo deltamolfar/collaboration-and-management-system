@@ -66,7 +66,7 @@ class DashboardApiController extends Controller
         $canViewAll = $user->role->abilities && in_array('project.view_all', $user->role->abilities);
         
         // Get recently created or updated tasks
-        $tasks = Task::with(['project.owner'])
+        $tasks = Task::with(['project.owner', 'users', 'comments.user'])
             ->when(!$canViewAll, function($query) use ($user) {
                 // Only show tasks assigned to user or from user's projects
                 $query->where(function($q) use ($user) {
