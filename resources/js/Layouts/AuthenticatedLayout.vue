@@ -5,10 +5,12 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import Flash from './Partials/Flash.vue';
 
 const showingNavigationDropdown = ref(false);
+const page = usePage();
+const user = page.props.auth.user;
 </script>
 
 <template>
@@ -58,6 +60,7 @@ const showingNavigationDropdown = ref(false);
                 Tasks
               </NavLink>
               <NavLink
+                v-if="user.role.abilities && user.role.abilities.includes('admin_dashboard.view')"
                 :href="route('admin.dashboard')"
                 :active="route().current('admin.dashboard')"
               >
@@ -215,10 +218,12 @@ const showingNavigationDropdown = ref(false);
 
     <!-- Page Content -->
     <main class="h-full">
-      <Flash flashName="success" flashColor="green" />
-      <Flash flashName="error" flashColor="red" />
-      <Flash flashName="warning" flashColor="yellow" />
-      <Flash flashName="info" flashColor="blue" />
+      <div class="fixed left-0 right-0 z-50 flex flex-col items-center pointer-events-none top-4">
+        <Flash flashName="success" flashColor="green" class="pointer-events-auto" />
+        <Flash flashName="error" flashColor="red" class="pointer-events-auto" />
+        <Flash flashName="warning" flashColor="yellow" class="pointer-events-auto" />
+        <Flash flashName="info" flashColor="blue" class="pointer-events-auto" />
+      </div>
       <slot class="h-full min-h-screen" />
     </main>
   </div>

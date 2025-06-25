@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import axios from 'axios';
 
@@ -90,7 +89,7 @@ onMounted(async () => {
                 <h1 class="text-3xl font-bold">{{ greeting }}, {{ user.name }}!</h1>
                 <p class="mt-1 text-gray-600 dark:text-gray-400">Here's what's happening with your projects today.</p>
               </div>
-              <div class="flex space-x-3">
+              <div v-if="user.role.abilities.includes('project.create')" class="flex space-x-3">
                 <Link :href="route('projects.create')" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                   New Project
