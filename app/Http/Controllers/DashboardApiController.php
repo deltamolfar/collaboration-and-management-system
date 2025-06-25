@@ -66,7 +66,7 @@ class DashboardApiController extends Controller
         $canViewAll = $user->role->abilities && in_array('project.view_all', $user->role->abilities);
         
         // Get recently created or updated tasks
-        $tasks = Task::with(['project.owner', 'users', 'comments.user'])
+        $tasks = Task::with(['project.owner'])
             ->when(!$canViewAll, function($query) use ($user) {
                 // Only show tasks assigned to user or from user's projects
                 $query->where(function($q) use ($user) {
@@ -84,7 +84,7 @@ class DashboardApiController extends Controller
             ->map(fn($task): array => [
                     'id' => "task-$task->id",
                     'type' => 'task',
-                    'user_name' => $task->user->name ?? 'Unknown',
+                    'user_name' => $task->owner?->name ?? 'Unknown',
                     'description' => "created task '{$task->name}' in project '{$task->project->name}'",
                     'created_at' => $task->created_at
                 ]
@@ -115,12 +115,52 @@ class DashboardApiController extends Controller
                     'created_at' => $comment->created_at
                 ];
             });
+
+        $logs = \App\Models\TaskLog::with(['task.project', 'user'])
+            ->when(!$canViewAll, function($query) use ($user) {
+                $query->whereHas('task', function($q) use ($user) {
+                    $q->whereHas('users', function($q2) use ($user) {
+                        $q2->where('users.id', $user->id);
+                    })
+                    ->orWhereHas('project', function($q2) use ($user) {
+                        $q2->where('user_id', $user->id);
+                    });
+                });
+            })
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(fn($log) => [
+                'id' => 'log-' . $log->id,
+                'type' => 'log',
+                'user_name' => $log->user->name ?? 'Unknown',
+                'description' => "logged time on task '{$log->task->name}'",
+                'created_at' => $log->created_at,
+            ]);
+
+        $projects = Project::with('owner')
+            ->when(!$canViewAll, function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(fn($project) => [
+                'id' => 'project-' . $project->id,
+                'type' => 'project',
+                'user_name' => $project->owner?->name ?? 'Unknown',
+                'description' => "created project '{$project->name}'",
+                'created_at' => $project->created_at,
+            ]);
         
         // Combine and sort by date
-        $activity = $tasks->concat($comments)
+        $activity = $tasks
+            ->concat($comments)
+            ->concat($logs)
+            ->concat($projects)
             ->sortByDesc('created_at')
             ->values()
-            ->take(10);
+            ->take(50);
         
         return response()->json($activity);
     }

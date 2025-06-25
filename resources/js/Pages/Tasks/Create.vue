@@ -243,7 +243,7 @@ const submit = () => {
                   <div>
                     <div class="flex items-center justify-between">
                       <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Project Progress</h4>
-                      <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ progress }}%</span>
+                      <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ progress ?? 0 }}%</span>
                     </div>
                     <div class="w-full h-2 mt-2 bg-gray-200 rounded-full dark:bg-gray-700">
                       <div class="h-2 bg-indigo-600 rounded-full dark:bg-indigo-500" :style="{ width: `${progress}%` }"></div>
