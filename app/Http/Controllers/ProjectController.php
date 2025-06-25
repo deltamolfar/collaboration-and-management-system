@@ -20,9 +20,14 @@ class ProjectController extends Controller
                 $query->where('status', 'completed');
             }]);
  
-        // Apply access restrictions unless user has view_all permission
+        // Restrict to owner or assigned users if no view_all
         if (!$hasViewAllPermission) {
-            $query->where('user_id', $user->id);
+            $query->where(function($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('users', function($q2) use ($user) {
+                      $q2->where('users.id', $user->id);
+                  });
+            });
         }
         
         // Apply filters
@@ -112,7 +117,11 @@ class ProjectController extends Controller
 
     public function show(Request $request, Project $project)
     {
-        if( !$request->user()->hasAbility('project.view_all') ) {
+        $user = $request->user();
+        $hasViewAllPermission = $user->hasAbility('project.view_all');
+        $isAssigned = $project->users->contains($user->id);
+
+        if (!$hasViewAllPermission && $project->user_id !== $user->id && !$isAssigned) {
             return redirect()->back()->with('error', 'You do not have permission to view this page.');
         }
     

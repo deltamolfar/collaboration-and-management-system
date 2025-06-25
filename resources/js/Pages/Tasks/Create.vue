@@ -41,7 +41,7 @@ const isSubmitting = ref(false);
 // Compute project progress
 const progress = computed(() => {
   if (!props.project.tasks_count) return 0;
-  return Math.round((props.project.completed_tasks_count / props.project.tasks_count) * 100);
+  return Math.round((completed_tasks_count.value / ((props.project.tasks.length == 0) ? 1 : props.project.tasks.length)) * 100);
 });
 
 const submit = () => {

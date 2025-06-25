@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import debounce from 'lodash/debounce';
 
 const props = defineProps({
   project: {
@@ -42,7 +41,7 @@ const completed_tasks_count = computed(() => {
 
 // Calculate project progress
 const progress = computed(() => {
-  return Math.round((completed_tasks_count.value / props.project.tasks.length == 0 ? 1 : props.project.tasks.length) * 100);
+  return Math.round((completed_tasks_count.value / ((props.project.tasks.length == 0) ? 1 : props.project.tasks.length)) * 100);
 });
 
 // Format date helper
