@@ -2,7 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   roles: {
@@ -61,6 +61,32 @@ async function createRole() {
   location.reload();
 }
 
+async function updateRole() {
+  console.log(roleObj.value);
+  if (!roleObj.value.name || !roleObj.value.api_name || !roleObj.value.abilities.length) {
+    alert('Please fill all fields');
+    return;
+  }
+
+  const valid = await axios.put(`/admin/settings/roles/${roleObj.value.id}`, roleObj.value)
+    .then(() => {
+      return true;
+    })
+    .catch(error => {
+      const responseErrors = error.response.data.errors;
+      errors.value.name = responseErrors?.name?.[0];
+      errors.value.api_name = responseErrors?.api_name?.[0];
+      errors.value.description = responseErrors?.description?.[0];
+      errors.value.abilities = responseErrors?.abilities?.[0];
+      return false;
+    });
+
+  if (!valid) return;
+
+  dialog.value = false;
+  location.reload();
+}
+
 function openCreateRole() {
   roleObj.value = {
     name: '',
@@ -75,6 +101,7 @@ function openCreateRole() {
 function openUpdateRole(role) {
   roleObj.value = {
     name: role.name,
+    id: role.id,
     api_name: role.api_name,
     description: role.description,
     abilities: role.abilities
@@ -85,6 +112,30 @@ function openUpdateRole(role) {
 
 const updatingDialog = ref(false);
 const dialog = ref(false);
+
+const allAbilities = [
+  'task.create',
+  'task.update',
+  'task.delete',
+  'task.log',
+  'task.log.view_all',
+  'task.comment',
+  'project.create',
+  'project.update',
+  'project.delete',
+  'project.assign',
+  'project.manage',
+  'project.view_all',
+  'role.create',
+  'role.update',
+  'role.delete',
+  'admin_dashboard.view',
+];
+
+const abilitiesValue = computed({
+  get: () => roleObj.value.abilities,
+  set: (val) => { roleObj.value.abilities = val; }
+});
 </script>
 
 <template>
@@ -133,10 +184,14 @@ const dialog = ref(false);
           </div>
           <div>
             <label class="block mb-1">Abilities</label>
-            <input v-model="roleObj.abilities" class="w-full p-2 border rounded" />
+            <select v-model="abilitiesValue" multiple class="w-full h-32 p-2 border rounded">
+              <option v-for="ability in allAbilities" :key="ability" :value="ability">
+                {{ ability }}
+              </option>
+            </select>
             <span class="text-red-500">{{ errors.abilities }}</span>
           </div>
-          <button @click="createRole" class="w-full py-2 text-white bg-blue-500 rounded hover:bg-blue-400">
+          <button @click="updatingDialog ? updateRole() : createRole()" class="w-full py-2 text-white bg-blue-500 rounded hover:bg-blue-400">
             {{ updatingDialog ? 'Update' : 'Create' }}
           </button>
         </div>

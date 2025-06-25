@@ -146,9 +146,6 @@ class DashboardController extends Controller
             'projects' => $projects,
             'users' => $users,
             'summary' => $summary,
-            'can' => [
-                'manage' => $user->hasAbility('task.log.manage'),
-            ],
         ]);
     }
 }

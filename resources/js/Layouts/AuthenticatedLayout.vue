@@ -214,7 +214,7 @@ const showingNavigationDropdown = ref(false);
     </header>
 
     <!-- Page Content -->
-    <main class="h-full min-h-screen">
+    <main class="h-full">
       <Flash flashName="success" flashColor="green" />
       <Flash flashName="error" flashColor="red" />
       <Flash flashName="warning" flashColor="yellow" />

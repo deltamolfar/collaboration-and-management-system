@@ -6,6 +6,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 import debounce from 'lodash/debounce';
 import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
   logs: Object,
@@ -13,7 +14,6 @@ const props = defineProps({
   projects: Array,
   users: Array,
   summary: Object,
-  can: Object,
 });
 
 const page = usePage();
@@ -227,6 +227,78 @@ const setCurrentWeek = () => {
 // Set current month dates
 const setCurrentMonth = () => {
   applyDateRangePreset(dateRangePresets[2]);
+};
+
+// State for editing and deleting logs
+const editingLog = ref(null);
+const showEditModal = ref(false);
+const editLogForm = ref({
+  time_start: '',
+  time_end: '',
+  time_spent: '',
+  description: '',
+});
+const editErrors = ref({});
+const showDeleteConfirm = ref(false);
+const logToDelete = ref(null);
+
+// Open edit modal and populate form
+const editLog = (log) => {
+  editingLog.value = log;
+  editLogForm.value = {
+    time_start: log.time_start ? log.time_start.slice(0, 16) : '',
+    time_end: log.time_end ? log.time_end.slice(0, 16) : '',
+    time_spent: log.time_spent,
+    description: log.description || '',
+  };
+  editErrors.value = {};
+  showEditModal.value = true;
+};
+
+// Submit edited log
+const submitEditLog = async () => {
+  editErrors.value = {};
+  try {
+    await axios.put(route('tasks.logs.update', {
+      project: editingLog.value.task.project_id,
+      task: editingLog.value.task_id,
+      log: editingLog.value.id,
+    }), {
+      ...editLogForm.value,
+      user_id: editingLog.value.user_id,
+      task_id: editingLog.value.task_id,
+    });
+    showEditModal.value = false;
+    editingLog.value = null;
+    filter(); // Refresh timesheet
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      editErrors.value = error.response.data.errors;
+    }
+  }
+};
+
+// Open delete confirmation
+const deleteLog = (log) => {
+  logToDelete.value = log;
+  showDeleteConfirm.value = true;
+};
+
+// Confirm delete
+const confirmDeleteLog = async () => {
+  try {
+    await axios.delete(route('tasks.logs.destroy', {
+      project: logToDelete.value.task.project_id,
+      task: logToDelete.value.task_id,
+      log: logToDelete.value.id,
+    }));
+    showDeleteConfirm.value = false;
+    logToDelete.value = null;
+    filter(); // Refresh timesheet
+  } catch (error) {
+    // Optionally handle error
+    showDeleteConfirm.value = false;
+  }
 };
 
 // Initialize with current week on mount if no dates are set
@@ -574,6 +646,60 @@ onMounted(() => {
             <p class="text-lg font-medium text-gray-900 dark:text-gray-100">No timesheet entries found.</p>
         </div>
     </div>
-    </AuthenticatedLayout>
+
+    <!-- Edit Log Modal -->
+    <Modal v-if="showEditModal" :show="showEditModal" @close="showEditModal = false">
+      <div class="p-6">
+        <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Edit Time Log</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Time</label>
+            <input type="datetime-local" v-model="editLogForm.time_start"
+              class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm" />
+            <div v-if="editErrors.time_start" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ editErrors.time_start }}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Time</label>
+            <input type="datetime-local" v-model="editLogForm.time_end"
+              class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm" />
+            <div v-if="editErrors.time_end" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ editErrors.time_end }}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (minutes)</label>
+            <input type="number" v-model="editLogForm.time_spent"
+              class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm" />
+            <div v-if="editErrors.time_spent" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ editErrors.time_spent }}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea v-model="editLogForm.description"
+              class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"></textarea>
+            <div v-if="editErrors.description" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ editErrors.description }}</div>
+          </div>
+        </div>
+        <div class="flex justify-end mt-6 space-x-2">
+          <button @click="showEditModal = false"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</button>
+          <button @click="submitEditLog"
+            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700">Save</button>
+        </div>
+      </div>
+    </Modal>
+
+    <!-- Delete Confirmation Modal -->
+    <Modal v-if="showDeleteConfirm" :show="showDeleteConfirm" @close="showDeleteConfirm = false">
+      <div class="p-6">
+        <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Delete Time Log</h3>
+        <p>Are you sure you want to delete this time log? This action cannot be undone.</p>
+        <div class="flex justify-end mt-6 space-x-2">
+          <button @click="showDeleteConfirm = false"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</button>
+          <button @click="confirmDeleteLog"
+            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700">Delete</button>
+        </div>
+      </div>
+    </Modal>
+
+  </AuthenticatedLayout>
 </template>
                     

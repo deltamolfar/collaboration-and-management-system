@@ -22,6 +22,7 @@ class Role extends Model
         'task.update',
         'task.delete',
         'task.log',
+        'task.log.view_all',
         'task.comment',
         'project.create',
         'project.update',

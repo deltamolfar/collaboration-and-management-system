@@ -22,6 +22,25 @@ class RoleController extends Controller
 
         Role::create($request->all());
 
-        return redirect()->route('roles.index')->with('success', 'Role created successfully.');
+        return response()->json([
+            'message' => 'Role created successfully.',
+            'role' => $request->all(),
+        ]);
+    }
+
+    public function update (Request $request, Role $role) {
+        $request->validate([
+            'api_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'abilities' => 'required|array|in:' . implode(',', Role::ability_list),
+        ]);
+
+        $role->update($request->all());
+
+        return response()->json([
+            'message' => 'Role updated successfully.',
+            'role' => $role,
+        ]);
     }
 }

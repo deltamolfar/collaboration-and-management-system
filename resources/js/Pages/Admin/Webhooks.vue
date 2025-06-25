@@ -404,15 +404,15 @@ onMounted(() => {
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
           <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-          <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
-            <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">Webhook Logs</h3>
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">Webhook Logs</h3>
             <div v-if="logsLoading">Loading...</div>
             <div v-else>
               <div v-if="logs.length === 0" class="text-gray-500">No logs found.</div>
               <ul v-else class="space-y-2 overflow-y-auto max-h-96">
-                <li v-for="log in logs" :key="log.id" class="p-2 border rounded">
-                  <div class="text-xs text-gray-500">{{ new Date(log.created_at).toLocaleString() }}</div>
+                <li v-for="log in logs" :key="log.id" class="p-2 border rounded dark:border-gray-600 dark:text-white">
+                  <div class="text-xs text-gray-500 dark:text-gray-400">{{ new Date(log.created_at).toLocaleString() }}</div>
                   <div class="text-xs">Status: <span :class="log.status_code === 200 ? 'text-green-600' : 'text-red-600'">{{ log.status_code ?? 'Undefined Code' }}</span></div>
                   <div class="text-xs break-all">Payload: {{ log.payload }}</div>
                   <div class="text-xs break-all">Response: {{ log.response }}</div>
@@ -420,8 +420,8 @@ onMounted(() => {
               </ul>
             </div>
           </div>
-          <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button @click="showLogsModal = false" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+          <div class="px-4 py-3 dark:bg-gray-700 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="showLogsModal = false" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:hover:bg-gray-700 dark:text-white dark:bg-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
               Close
             </button>
           </div>
